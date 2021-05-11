@@ -1,2 +1,2 @@
 # api-orn
-API Orthographic Recognising Network
+API for an Orthographic Recognising Network
