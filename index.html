@@ -78,9 +78,12 @@
       // -> [redpx0,greenpx0,bluepx0,alphapx0,…]
 
       const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      console.log(`imgData`, imgData);
       alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
       blackValuesOnly = alphaFilteredData.filter((d) => d === 255);
+
       console.log(`alphaFilteredData`, alphaFilteredData);
+      console.log(`alphaFilteredData string [${alphaFilteredData.toString()}]`);
       console.log(`blackValuesOnly`, blackValuesOnly);
     }
 
@@ -114,8 +117,8 @@
   <body onload="init()">
     <canvas
       id="can"
-      width="10"
-      height="10"
+      width="28"
+      height="28"
       style="position: absolute; top: 10%; left: 10%; border: 2px solid"
     ></canvas>
     <img
