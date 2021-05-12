@@ -111,9 +111,11 @@
       const flattenedPrediction = prediction.dataSync();
       console.log(flattenedPrediction);
       let i = flattenedPrediction.indexOf(Math.max(...flattenedPrediction));
-      document.getElementById('predictionOutput').innerHTML = `Ergebnis: ${
-        i + 1
-      }; Wahrscheinlichkeit: ${flattenedPrediction[i] * 100}%`;
+      document.getElementById(
+        'predictionOutput'
+      ).innerHTML = `Ergebnis: ${i}; Wahrscheinlichkeit: ${
+        flattenedPrediction[i] * 100
+      }%`;
     }
 
     function findxy(res, e) {
