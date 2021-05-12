@@ -1,146 +1,150 @@
 <html>
-  <script type="text/javascript">
-    let canvas,
-      ctx,
-      flag = false,
-      prevX = 0,
-      currX = 0,
-      prevY = 0,
-      currY = 0;
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
 
-    const x = 'black',
-      y = 2;
+<script type="text/javascript">
+  // JavaScript
 
-    function init() {
-      canvas = document.getElementById('can');
-      ctx = canvas.getContext('2d');
-      w = canvas.width;
-      h = canvas.height;
+  // import * as tf from '@tensorflow/tfjs';
 
-      canvas.addEventListener(
-        'mousemove',
-        function (e) {
-          findxy('move', e);
-        },
-        false
-      );
-      canvas.addEventListener(
-        'mousedown',
-        function (e) {
-          findxy('down', e);
-        },
-        false
-      );
-      canvas.addEventListener(
-        'mouseup',
-        function (e) {
-          findxy('up', e);
-        },
-        false
-      );
-      canvas.addEventListener(
-        'mouseout',
-        function (e) {
-          findxy('out', e);
-        },
-        false
-      );
+  let canvas,
+    ctx,
+    flag = false,
+    prevX = 0,
+    currX = 0,
+    prevY = 0,
+    currY = 0;
+
+  const x = 'black',
+    y = 2;
+
+  let model;
+
+  function init() {
+    canvas = document.getElementById('can');
+    ctx = canvas.getContext('2d');
+    w = canvas.width;
+    h = canvas.height;
+
+    canvas.addEventListener(
+      'mousemove',
+      function (e) {
+        findxy('move', e);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'mousedown',
+      function (e) {
+        findxy('down', e);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'mouseup',
+      function (e) {
+        findxy('up', e);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'mouseout',
+      function (e) {
+        findxy('out', e);
+      },
+      false
+    );
+
+    loadModel();
+  }
+
+  async function loadModel() {
+    model = await tf.loadLayersModel('./model/model.json');
+
+    console.log(model)
+  }
+
+  function draw() {
+    ctx.beginPath();
+    ctx.moveTo(prevX, prevY);
+    ctx.lineTo(currX, currY);
+    ctx.strokeStyle = x;
+    ctx.lineWidth = y;
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+  function erase() {
+    const m = confirm('Möchten Sie Ihre Zeichnung löschen?');
+    if (m) {
+      ctx.clearRect(0, 0, w, h);
+      document.getElementById('canvasimg').style.display = 'none';
     }
+  }
 
-    function draw() {
+  function save() {
+    //   document.getElementById('canvasimg').style.border = '2px solid';
+    //   const dataURL = canvas.toDataURL();
+    //   document.getElementById('canvasimg').src = dataURL;
+    //   document.getElementById('canvasimg').style.display = 'inline';
+
+    // red=imgData.data[0];
+    // green=imgData.data[1];
+    // blue=imgData.data[2];
+    // alpha=imgData.data[3];
+    // -> [redpx0,greenpx0,bluepx0,alphapx0,…]
+
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    console.log(`imgData`, imgData);
+    alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
+    blackValuesOnly = alphaFilteredData.filter((d) => d === 255);
+
+    console.log(`alphaFilteredData`, alphaFilteredData);
+    console.log(`alphaFilteredData string [${alphaFilteredData.toString()}]`);
+    console.log(`blackValuesOnly`, blackValuesOnly);
+
+    const example = tf.fromPixels(imgData);  // for example
+    const prediction = model.predict(example);
+
+    console.log(prediction);
+  }
+
+  function findxy(res, e) {
+    if (res == 'down') {
+      prevX = currX;
+      prevY = currY;
+      currX = e.clientX - canvas.offsetLeft;
+      currY = e.clientY - canvas.offsetTop;
+
+      flag = true;
       ctx.beginPath();
-      ctx.moveTo(prevX, prevY);
-      ctx.lineTo(currX, currY);
-      ctx.strokeStyle = x;
-      ctx.lineWidth = y;
-      ctx.stroke();
+      ctx.fillStyle = x;
+      ctx.fillRect(currX, currY, 2, 2);
       ctx.closePath();
     }
-
-    function erase() {
-      const m = confirm('Möchten Sie Ihre Zeichnung löschen?');
-      if (m) {
-        ctx.clearRect(0, 0, w, h);
-        document.getElementById('canvasimg').style.display = 'none';
-      }
+    if (res == 'up' || res == 'out') {
+      flag = false;
     }
-
-    function save() {
-      //   document.getElementById('canvasimg').style.border = '2px solid';
-      //   const dataURL = canvas.toDataURL();
-      //   document.getElementById('canvasimg').src = dataURL;
-      //   document.getElementById('canvasimg').style.display = 'inline';
-
-      // red=imgData.data[0];
-      // green=imgData.data[1];
-      // blue=imgData.data[2];
-      // alpha=imgData.data[3];
-      // -> [redpx0,greenpx0,bluepx0,alphapx0,…]
-
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      console.log(`imgData`, imgData);
-      alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
-      blackValuesOnly = alphaFilteredData.filter((d) => d === 255);
-
-      console.log(`alphaFilteredData`, alphaFilteredData);
-      console.log(`alphaFilteredData string [${alphaFilteredData.toString()}]`);
-      console.log(`blackValuesOnly`, blackValuesOnly);
-    }
-
-    function findxy(res, e) {
-      if (res == 'down') {
+    if (res == 'move') {
+      if (flag) {
         prevX = currX;
         prevY = currY;
         currX = e.clientX - canvas.offsetLeft;
         currY = e.clientY - canvas.offsetTop;
-
-        flag = true;
-        ctx.beginPath();
-        ctx.fillStyle = x;
-        ctx.fillRect(currX, currY, 2, 2);
-        ctx.closePath();
-      }
-      if (res == 'up' || res == 'out') {
-        flag = false;
-      }
-      if (res == 'move') {
-        if (flag) {
-          prevX = currX;
-          prevY = currY;
-          currX = e.clientX - canvas.offsetLeft;
-          currY = e.clientY - canvas.offsetTop;
-          draw();
-        }
+        draw();
       }
     }
-  </script>
-  <body onload="init()">
-    <canvas
-      id="can"
-      width="28"
-      height="28"
-      style="position: absolute; top: 10%; left: 10%; border: 2px solid"
-    ></canvas>
-    <img
-      id="canvasimg"
-      style="position: absolute; top: 10%; left: 52%"
-      style="display: none"
-    />
-    <input
-      type="button"
-      value="save"
-      id="btn"
-      size="30"
-      onclick="save()"
-      style="position: absolute; top: 55%; left: 10%"
-    />
-    <input
-      type="button"
-      value="clear"
-      id="clr"
-      size="23"
-      onclick="erase()"
-      style="position: absolute; top: 55%; left: 15%"
-    />
-  </body>
+  }
+</script>
+
+<body onload="init()">
+  <canvas id="can" width="28" height="28"
+    style="position: absolute; top: 10%; left: 10%; border: 2px solid"></canvas>
+  <img id="canvasimg" style="position: absolute; top: 10%; left: 52%"
+    style="display: none" />
+  <input type="button" value="save" id="btn" size="30" onclick="save()"
+    style="position: absolute; top: 55%; left: 10%" />
+  <input type="button" value="clear" id="clr" size="23"
+    onclick="erase()" style="position: absolute; top: 55%; left: 15%" />
+</body>
+
 </html>
