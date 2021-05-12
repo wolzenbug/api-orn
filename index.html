@@ -74,11 +74,8 @@
     }
 
     function erase() {
-      const m = confirm('Möchten Sie Ihre Zeichnung löschen?');
-      if (m) {
-        ctx.clearRect(0, 0, w, h);
-        document.getElementById('canvasimg').style.display = 'none';
-      }
+      ctx.clearRect(0, 0, w, h);
+      document.getElementById('canvasimg').style.display = 'none';
     }
 
     function predict() {
@@ -114,7 +111,7 @@
       document.getElementById(
         'predictionOutput'
       ).innerHTML = `Ergebnis: ${i}; Wahrscheinlichkeit: ${
-        flattenedPrediction[i] * 100
+        flattenedPrediction[i].toFixed(4) * 100
       }%`;
     }
 
