@@ -1,4 +1,6 @@
 
+import { normalize } from "./helpers.js";
+
 // JavaScript
 // source: https://www.kaggle.com/crawford/emnist?select=emnist-byclass-mapping.txt
 const emnistMap = [
@@ -11,6 +13,8 @@ const emnistMap = [
 
 let canvas,
   ctx,
+  w = 0,
+  h = 0,
   flag = false,
   prevX = 0,
   currX = 0,
@@ -59,7 +63,23 @@ function init() {
     false
   );
 
+  document.getElementById("btn").addEventListener(
+    'click',
+    function (e) {
+      onSubmit()
+    },
+    false
+  );
+  document.getElementById("clr").addEventListener(
+    'click',
+    function (e) {
+      erase();
+    },
+    false
+  )
+
   loadModel();
+
   predContainer.style.display = "none";
 }
 
@@ -86,7 +106,8 @@ function draw() {
 
 function erase() {
   ctx.clearRect(0, 0, w, h);
-  document.getElementById('canvasimg').style.display = 'none';
+
+  // document.getElementById('canvasimg').style.display = 'none';
 }
 
 function predict() {
@@ -102,26 +123,35 @@ function predict() {
   // -> [redpx0,greenpx0,bluepx0,alphapx0,…]
 
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  console.log(`imgData`, imgData);
-  alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
-  blackValuesOnly = alphaFilteredData.filter((d) => d > 0);
 
+  const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
+  const blackValuesOnly = alphaFilteredData.filter((d) => d > 0);
+
+  // console.log(`imgData`, imgData);
   // console.log(`alphaFilteredData`, alphaFilteredData);
   // console.log(`alphaFilteredData string [${alphaFilteredData.toString()}]`);
   // console.log(`blackValuesOnly`, blackValuesOnly);
 
-  const x = tf.tensor(Uint8Array.from(alphaFilteredData));
-  console.log(`x`, x);
-  const example = tf.reshape(x, [1, 28, 28]);
+  const values = normalize(Uint8Array.from(alphaFilteredData));
+  console.log('values', values);
+  const x = tf.tensor(values);
+  console.log('x', x);
+
+  const example = tf.reshape(x, [-1, 28, 28, 1]);
   console.log(`example`, example);
-  const prediction = model.predict(example); // <- this is a tensor larri :-)
+
+  const prediction = model.predict(example);
   console.log(`prediction`, prediction);
+
   prediction.print();
+
   const flattenedPrediction = prediction.dataSync();
   console.log(flattenedPrediction);
+
   const i = flattenedPrediction.indexOf(Math.max(...flattenedPrediction));
   console.log(`i`, i);
   console.log(`flattenedPrediction[i]`, flattenedPrediction[i]);
+
   document.getElementById(
     'predictionOutput'
   ).innerHTML = `Ergebnis: ${String.fromCharCode(
@@ -155,3 +185,5 @@ function findxy(res, e) {
     }
   }
 }
+
+init();
