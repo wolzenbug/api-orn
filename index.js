@@ -1,18 +1,19 @@
-
-import { normalize } from "./helpers.js";
+import { normalize } from './helpers.js';
 
 // JavaScript
 // source: https://www.kaggle.com/crawford/emnist?select=emnist-byclass-mapping.txt
 const emnistMap = [
-  48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72,
-  73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
-  97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
-  112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122,
+  48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73,
+  74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98,
+  99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
+  115, 116, 117, 118, 119, 120, 121, 122,
 ];
 // import * as tf from '@tensorflow/tfjs';
 
 let canvas,
+  canvasResized,
   ctx,
+  ctxResized,
   w = 0,
   h = 0,
   flag = false,
@@ -20,19 +21,24 @@ let canvas,
   currX = 0,
   prevY = 0,
   currY = 0,
-  predContainer;
+  predContainer,
+  currPath = new Path2D();
 
 const x = 'black',
-  y = 2;
+  y = 12,
+  l = 'round';
 
 let model;
 
 function init() {
   canvas = document.getElementById('can');
   predContainer = document.getElementById('pred-container');
-  ctx = canvas.getContext('2d');
+  ctx = canvas.getContext('2d'); // CanvasRenderingContext2D
   w = canvas.width;
   h = canvas.height;
+
+  canvasResized = document.getElementById('can-resized');
+  ctxResized = canvasResized.getContext('2d');
 
   canvas.addEventListener(
     'mousemove',
@@ -63,28 +69,35 @@ function init() {
     false
   );
 
-  document.getElementById("btn").addEventListener(
+  document.getElementById('btn').addEventListener(
     'click',
     function (e) {
-      onSubmit()
+      onSubmit();
     },
     false
   );
-  document.getElementById("clr").addEventListener(
+  document.getElementById('clr').addEventListener(
     'click',
     function (e) {
       erase();
     },
     false
-  )
+  );
+  document.getElementById('scl').addEventListener(
+    'click',
+    function (e) {
+      scale();
+    },
+    false
+  );
 
   loadModel();
 
-  predContainer.style.display = "none";
+  predContainer.style.display = 'none';
 }
 
 function onSubmit() {
-  predContainer.style.display = "block";
+  predContainer.style.display = 'block';
   predict();
 }
 
@@ -95,19 +108,35 @@ async function loadModel() {
 }
 
 function draw() {
+  // currPath.beginPath();
+  // currPath.moveTo(prevX, prevY);
+  // currPath.lineTo(currX, currY);
+  // currPath.strokeStyle = x;
+  // currPath.lineWidth = y;
+  // currPath.lineCap = l;
+  // ctx.stroke(currPath);
+  // ctx.closePath();
   ctx.beginPath();
   ctx.moveTo(prevX, prevY);
   ctx.lineTo(currX, currY);
   ctx.strokeStyle = x;
   ctx.lineWidth = y;
+  ctx.lineCap = l;
   ctx.stroke();
   ctx.closePath();
 }
 
 function erase() {
   ctx.clearRect(0, 0, w, h);
-
+  ctxResized.clearRect(0, 0, w, h);
   // document.getElementById('canvasimg').style.display = 'none';
+}
+
+function scale() {
+  // const imageData = ctx.getImageData(0, 0, 280, 280);
+  // ctxResized.putImageData(imageData, 0, 0);
+  // ctxResized.scale(0.1, 0.1);
+  ctxResized.drawImage(canvas, 0, 0, 28, 28);
 }
 
 function predict() {
@@ -122,10 +151,15 @@ function predict() {
   // alpha=imgData.data[3];
   // -> [redpx0,greenpx0,bluepx0,alphapx0,…]
 
-  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const imgData = ctxResized.getImageData(
+    0,
+    0,
+    canvasResized.width,
+    canvasResized.height
+  );
 
   const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
-  const blackValuesOnly = alphaFilteredData.filter((d) => d > 0);
+  // const blackValuesOnly = alphaFilteredData.filter((d) => d > 0);
 
   // console.log(`imgData`, imgData);
   // console.log(`alphaFilteredData`, alphaFilteredData);

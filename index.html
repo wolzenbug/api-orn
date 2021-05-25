@@ -1,39 +1,65 @@
 <!DOCTYPE html>
 <html lang="de">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
 
-<title>API ORN - API for an Orthographic Recognising Network</title>
+  <title>API ORN - API for an Orthographic Recognising Network</title>
 
-<head>
-    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
-        rel="stylesheet">
-    <script
-        src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+  <head>
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
     <script type="module" src="./index.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="m-6">
-        <div class="bg-gray-50 inline-block p-2 rounded-sm shadow-sm">
-            <div class="flex justify-center">
-                <canvas id="can" width="28" height="28"
-                    class="border-2 border-indigo-100 bg-white m-2 rounded-sm"></canvas>
-            </div>
-            <div class="flex">
-                <input type="button" value="Bestätigen" id="btn"
-                    class="bg-indigo-600 m-2 p-1 px-2 rounded-sm text-white w-24" />
-                <input type="button" value="Löschen" id="clr"
-                    class="bg-indigo-600 m-2 p-1 px-2 rounded-sm text-white w-24" />
-            </div>
+      <div class="bg-gray-50 inline-block p-2 rounded-sm shadow-sm">
+        <div class="flex justify-center">
+          <canvas
+            id="can"
+            width="280"
+            height="280"
+            class="border-2 border-indigo-100 bg-white m-2 rounded-sm"
+          ></canvas>
         </div>
+        <div class="flex justify-center">
+          <canvas
+            id="can-resized"
+            width="28"
+            height="28"
+            class="border-2 border-indigo-100 bg-white m-2 rounded-sm"
+          ></canvas>
+        </div>
+
+        <div class="flex">
+          <input
+            type="button"
+            value="Bestätigen"
+            id="btn"
+            class="bg-green-600 m-2 p-1 px-2 rounded-sm text-white w-24"
+          />
+          <input
+            type="button"
+            value="Löschen"
+            id="clr"
+            class="bg-red-600 m-2 p-1 px-2 rounded-sm text-white w-24"
+          />
+          <input
+            type="button"
+            value="Scale"
+            id="scl"
+            class="bg-indigo-600 m-2 p-1 px-2 rounded-sm text-white w-24"
+          />
+        </div>
+      </div>
     </div>
     <div id="pred-container" class="m-6">
-        <div class="bg-indigo-400 p-1.5 inline-block px-2 rounded-sm shadow-sm">
-            <span id="predictionOutput" class="text-white">
-            </span>
-        </div>
+      <div class="bg-indigo-400 p-1.5 inline-block px-2 rounded-sm shadow-sm">
+        <span id="predictionOutput" class="text-white"> </span>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>
