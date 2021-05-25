@@ -25,7 +25,7 @@ let canvas,
   currPath = new Path2D();
 
 const x = 'black',
-  y = 12,
+  y = 10,
   l = 'round';
 
 let model;
@@ -108,22 +108,12 @@ async function loadModel() {
 }
 
 function draw() {
-  // currPath.beginPath();
-  // currPath.moveTo(prevX, prevY);
-  // currPath.lineTo(currX, currY);
-  // currPath.strokeStyle = x;
-  // currPath.lineWidth = y;
-  // currPath.lineCap = l;
-  // ctx.stroke(currPath);
-  // ctx.closePath();
-  ctx.beginPath();
-  ctx.moveTo(prevX, prevY);
-  ctx.lineTo(currX, currY);
+  currPath.moveTo(prevX, prevY);
+  currPath.lineTo(currX, currY);
   ctx.strokeStyle = x;
   ctx.lineWidth = y;
   ctx.lineCap = l;
-  ctx.stroke();
-  ctx.closePath();
+  ctx.stroke(currPath);
 }
 
 function erase() {
@@ -133,10 +123,16 @@ function erase() {
 }
 
 function scale() {
-  // const imageData = ctx.getImageData(0, 0, 280, 280);
-  // ctxResized.putImageData(imageData, 0, 0);
-  // ctxResized.scale(0.1, 0.1);
-  ctxResized.drawImage(canvas, 0, 0, 28, 28);
+  // https://stackoverflow.com/a/51348478/6783713
+  const m = document
+    .createElementNS('http://www.w3.org/2000/svg', 'svg')
+    .createSVGMatrix();
+  const p = new Path2D();
+  const t = m.scale(0.1);
+  p.addPath(currPath, t);
+  ctxResized.lineCap = l;
+  ctxResized.lineWidth = 2;
+  ctxResized.stroke(p);
 }
 
 function predict() {
