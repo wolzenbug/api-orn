@@ -119,6 +119,7 @@ function draw() {
 function erase() {
   ctx.clearRect(0, 0, w, h);
   ctxResized.clearRect(0, 0, w, h);
+  currPath = new Path2D();
   // document.getElementById('canvasimg').style.display = 'none';
 }
 
