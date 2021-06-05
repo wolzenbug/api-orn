@@ -96,8 +96,30 @@ function init() {
   predContainer.style.display = 'none';
 }
 
+function execTesseract() {
+  const worker = Tesseract.createWorker({
+    logger: m => console.log(m),
+  });
+
+  (async () => {
+    await worker.load();
+    await worker.loadLanguage('grc');
+    await worker.initialize('grc');
+    await worker.setParameters({
+      tessedit_pageseg_mode: 10, //  PSM_SINGLE_CHAR
+      tessedit_char_whitelist: 'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσΤτΥυΦφΧχΨψΩω',
+    });
+    const { data: { text } } = await worker.recognize(canvas);
+    console.log(text);
+    await worker.terminate();
+  })();
+}
+
 function onSubmit() {
   predContainer.style.display = 'block';
+
+  execTesseract();
+
   predict();
 }
 
