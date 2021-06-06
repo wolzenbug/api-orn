@@ -30,6 +30,9 @@ const x = 'black',
 
 let model;
 
+let task = '',
+  currentTaskCharacter = '';
+
 function init() {
   canvas = document.getElementById('can');
   predContainer = document.getElementById('pred-container');
@@ -83,10 +86,17 @@ function init() {
     },
     false
   );
-  document.getElementById('scl').addEventListener(
+  document.getElementById('r').addEventListener(
     'click',
     function (e) {
-      scale();
+      speak();
+    },
+    false
+  );
+  document.getElementById('q').addEventListener(
+    'click',
+    function (e) {
+      newTask();
     },
     false
   );
@@ -98,7 +108,7 @@ function init() {
 
 function execTesseract() {
   const worker = Tesseract.createWorker({
-    logger: m => console.log(m),
+    logger: (m) => console.log(m),
   });
 
   (async () => {
@@ -107,16 +117,20 @@ function execTesseract() {
     await worker.initialize('grc');
     await worker.setParameters({
       tessedit_pageseg_mode: 10, //  PSM_SINGLE_CHAR
-      tessedit_char_whitelist: 'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσΤτΥυΦφΧχΨψΩω',
+      tessedit_char_whitelist:
+        'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσΤτΥυΦφΧχΨψΩω',
     });
-    const { data: { text } } = await worker.recognize(canvas);
+    const {
+      data: { text },
+    } = await worker.recognize(canvas);
     console.log(text);
     await worker.terminate();
   })();
 }
 
 function onSubmit() {
-  predContainer.style.display = 'block';
+  predContainer.style.display = 'inline-flex';
+  predContainer.style.margin = '1rem';
 
   execTesseract();
 
@@ -158,17 +172,43 @@ function scale() {
   ctxResized.stroke(p);
 }
 
-function predict() {
-  //   document.getElementById('canvasimg').style.border = '2px solid';
-  //   const dataURL = canvas.toDataURL();
-  //   document.getElementById('canvasimg').src = dataURL;
-  //   document.getElementById('canvasimg').style.display = 'inline';
+function newTask() {
+  const randomCharIndex = Math.floor(Math.random() * emnistMap.length);
+  const character = String.fromCharCode(emnistMap[randomCharIndex]);
+  let charInfo = '';
+  if (!isNaN(character * 1)) {
+    charInfo += 'eine';
+  } else {
+    if (character == character.toUpperCase()) {
+      charInfo += 'ein großes';
+    } else if (character == character.toLowerCase()) {
+      charInfo += 'ein kleines';
+    }
+  }
+  currentTaskCharacter = character;
+  task = `Zeichnen Sie ${charInfo} ${character}`;
+  document.getElementById('taskField').innerHTML = task;
+  console.log(`task`, task);
+}
 
-  // red=imgData.data[0];
-  // green=imgData.data[1];
-  // blue=imgData.data[2];
-  // alpha=imgData.data[3];
-  // -> [redpx0,greenpx0,bluepx0,alphapx0,…]
+function speak() {
+  let msg = new SpeechSynthesisUtterance();
+  msg.text = task;
+  msg.lang = 'de-DE';
+  msg.volume = 0.5; // 0 to 1
+  msg.rate = 1; // 0.1 to 10
+  msg.pitch = 1; //0 to 2
+
+  // msg.onend = function (e) {
+  //   document.querySelector('#output').innerText =
+  //     event.elapsedTime / 1000 + ' Sek';
+  // };
+
+  speechSynthesis.speak(msg);
+}
+
+function predict() {
+  scale();
 
   const imgData = ctxResized.getImageData(
     0,
@@ -178,23 +218,17 @@ function predict() {
   );
 
   const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
-  // const blackValuesOnly = alphaFilteredData.filter((d) => d > 0);
-
-  // console.log(`imgData`, imgData);
-  // console.log(`alphaFilteredData`, alphaFilteredData);
-  // console.log(`alphaFilteredData string [${alphaFilteredData.toString()}]`);
-  // console.log(`blackValuesOnly`, blackValuesOnly);
 
   const values = normalize(Uint8Array.from(alphaFilteredData));
-  console.log('values', values);
+  // console.log('values', values);
   const x = tf.tensor(values);
-  console.log('x', x);
+  // console.log('x', x);
 
   const example = tf.reshape(x, [-1, 28, 28, 1]);
-  console.log(`example`, example);
+  // console.log(`example`, example);
 
   const prediction = model.predict(example);
-  console.log(`prediction`, prediction);
+  // console.log(`prediction`, prediction);
 
   prediction.print();
 
@@ -202,14 +236,31 @@ function predict() {
   console.log(flattenedPrediction);
 
   const i = flattenedPrediction.indexOf(Math.max(...flattenedPrediction));
-  console.log(`i`, i);
-  console.log(`flattenedPrediction[i]`, flattenedPrediction[i]);
+  const predictedResult = String.fromCharCode(emnistMap[i]);
+  const isResultCorrect = predictedResult === currentTaskCharacter;
+  // console.log(`i`, i);
+  // console.log(`flattenedPrediction[i]`, flattenedPrediction[i]);
 
-  document.getElementById(
-    'predictionOutput'
-  ).innerHTML = `Ergebnis: ${String.fromCharCode(
-    emnistMap[i]
-  )}; Wahrscheinlichkeit: ${(flattenedPrediction[i] * 100).toFixed(4)}%`;
+  // Append new DOM object
+  const tag = document.createElement('p');
+  const text = document.createTextNode(
+    `Erkannt: '${predictedResult}' Wahrscheinlichkeit: ${(
+      flattenedPrediction[i] * 100
+    ).toFixed(2)}%`
+  );
+  const color = isResultCorrect ? 'bg-green-500' : 'bg-red-500';
+  tag.classList.add(
+    color,
+    'p-1.5',
+    'inline-block',
+    'px-2',
+    'rounded-sm',
+    'shadow-sm'
+  );
+
+  tag.appendChild(text);
+  const element = document.getElementById('pred-container');
+  element.appendChild(tag);
 }
 
 function findxy(res, e) {

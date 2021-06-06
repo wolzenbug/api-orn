@@ -11,19 +11,27 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
-    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
     <script type="module" src="./index.js"></script>
   </head>
 
   <body>
     <div class="m-6">
       <div class="bg-gray-50 inline-block p-2 rounded-sm shadow-sm">
+        <div
+          id="taskContainer"
+          class="mb-4 mt-2 text-gray-700 flex flex-col text-center"
+        >
+          <span id="taskField" class="font-semibold"
+            >Zum Starten auf Neu klicken</span
+          >
+        </div>
         <div class="flex justify-center">
           <canvas
             id="can"
             width="280"
             height="280"
-            class="border-2 border-indigo-100 bg-white m-2 rounded-sm"
+            class="border-2 border-indigo-100 bg-white m-2 rounded-md"
           ></canvas>
         </div>
         <div class="flex justify-center">
@@ -36,31 +44,103 @@
         </div>
 
         <div class="flex">
-          <input
+          <button
             type="button"
-            value="Bestätigen"
             id="btn"
-            class="bg-green-600 m-2 p-1 px-2 rounded-sm text-white w-24"
-          />
-          <input
+            class="
+              bg-green-600
+              m-2
+              p-1
+              px-2
+              rounded-sm
+              text-white
+              transition
+              hover:bg-green-500
+            "
+          >
+            Scale & Predict
+          </button>
+          <button
             type="button"
-            value="Löschen"
             id="clr"
-            class="bg-red-600 m-2 p-1 px-2 rounded-sm text-white w-24"
-          />
-          <input
+            class="
+              bg-red-600
+              m-2
+              p-1
+              px-2
+              rounded-sm
+              text-white
+              w-24
+              transition
+              hover:bg-red-500
+            "
+          >
+            Löschen
+          </button>
+          <button
             type="button"
-            value="Scale"
-            id="scl"
-            class="bg-indigo-600 m-2 p-1 px-2 rounded-sm text-white w-24"
-          />
+            id="q"
+            class="
+              bg-indigo-600
+              m-2
+              p-1
+              px-2
+              rounded-sm
+              text-white
+              w-24
+              transition
+              hover:bg-indigo-500
+            "
+          >
+            Neu
+          </button>
+          <button
+            type="button"
+            id="r"
+            class="
+              bg-indigo-600
+              m-2
+              p-1
+              px-2
+              rounded-sm
+              text-white
+              w-24
+              flex
+              justify-center
+              transition
+              hover:bg-indigo-500
+            "
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              version="1.0"
+              width="24"
+              height="24"
+              viewBox="0 0 75 75"
+            >
+              <path
+                d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z"
+                style="
+                  stroke: #fff;
+                  stroke-width: 5;
+                  stroke-linejoin: round;
+                  fill: #fff;
+                "
+              />
+              <path
+                d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6"
+                style="
+                  fill: none;
+                  stroke: #fff;
+                  stroke-width: 5;
+                  stroke-linecap: round;
+                "
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
-    <div id="pred-container" class="m-6">
-      <div class="bg-indigo-400 p-1.5 inline-block px-2 rounded-sm shadow-sm">
-        <span id="predictionOutput" class="text-white"> </span>
-      </div>
-    </div>
+    <div id="pred-container" class="flex flex-col text-white space-y-3"></div>
   </body>
 </html>
