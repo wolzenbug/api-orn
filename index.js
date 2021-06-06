@@ -10,6 +10,24 @@ const emnistMap = [
 ];
 // import * as tf from '@tensorflow/tfjs';
 
+const successResultVoiceLines = [
+  'Hammer, alter voll geil.',
+  'Mega gut!',
+  'Sie sind einfach ultra cool.',
+  'Wie kann man nur so genial sein?',
+  'Sehr professionell!',
+  'Gut gemacht, weiter so!',
+];
+
+const failResultVoiceLines = [
+  'Oh scheiße, das war nix.',
+  'Nicht ganz korrekt, versuchs noch einmal.',
+  "Geht's noch?",
+  'Noch einmal, jetzt!',
+  'Diesmal vielleicht richtig?',
+  'Jetzt gib dir doch mal Mühe!',
+];
+
 let canvas,
   canvasResized,
   ctx,
@@ -89,7 +107,7 @@ function init() {
   document.getElementById('r').addEventListener(
     'click',
     function (e) {
-      speak();
+      speak(task);
     },
     false
   );
@@ -191,18 +209,13 @@ function newTask() {
   console.log(`task`, task);
 }
 
-function speak() {
+function speak(text) {
   let msg = new SpeechSynthesisUtterance();
-  msg.text = task;
+  msg.text = text;
   msg.lang = 'de-DE';
   msg.volume = 0.5; // 0 to 1
   msg.rate = 1; // 0.1 to 10
   msg.pitch = 1; //0 to 2
-
-  // msg.onend = function (e) {
-  //   document.querySelector('#output').innerText =
-  //     event.elapsedTime / 1000 + ' Sek';
-  // };
 
   speechSynthesis.speak(msg);
 }
@@ -238,6 +251,16 @@ function predict() {
   const i = flattenedPrediction.indexOf(Math.max(...flattenedPrediction));
   const predictedResult = String.fromCharCode(emnistMap[i]);
   const isResultCorrect = predictedResult === currentTaskCharacter;
+  speak(
+    isResultCorrect
+      ? successResultVoiceLines[
+          Math.floor(Math.random() * successResultVoiceLines.length)
+        ]
+      : failResultVoiceLines[
+          Math.floor(Math.random() * failResultVoiceLines.length)
+        ]
+  );
+
   // console.log(`i`, i);
   // console.log(`flattenedPrediction[i]`, flattenedPrediction[i]);
 
