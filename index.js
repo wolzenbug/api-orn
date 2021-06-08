@@ -118,6 +118,13 @@ function init() {
     },
     false
   );
+  document.getElementById('s').addEventListener(
+    'click',
+    function (e) {
+      onSave();
+    },
+    false
+  );
 
   loadModel();
 
@@ -134,7 +141,7 @@ function execTesseract() {
     await worker.loadLanguage('grc');
     await worker.initialize('grc');
     await worker.setParameters({
-      tessedit_pageseg_mode: 10, //  PSM_SINGLE_CHAR
+      tessedit_pageseg_mode: 10, // PSM_SINGLE_CHAR
       tessedit_char_whitelist:
         'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσΤτΥυΦφΧχΨψΩω',
     });
@@ -153,6 +160,14 @@ function onSubmit() {
   execTesseract();
 
   predict();
+}
+
+function onSave() {
+  var link = document.createElement('a');
+  link.download = 'canvas.png';
+  link.href = canvas.toDataURL()
+  link.click();
+  link.delete;
 }
 
 async function loadModel() {

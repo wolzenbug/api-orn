@@ -1,0 +1,20 @@
+:root {
+  --indigo-600: #4F46E5;
+
+  --transition-timing-function: cubic-bezier(0.4,0,0.2,1);
+  --transition-duration: 150ms;
+}
+
+.speaker-button svg path {
+  stroke: var(--indigo-600);
+  fill: var(--indigo-600);
+
+  transition-property: stroke,fill;
+  transition-timing-function: var(--transition-timing-function);
+  transition-duration: var(--transition-duration);
+}
+
+.speaker-button:hover svg path {
+  stroke: white;
+  fill: white;
+}
