@@ -1,14 +1,7 @@
-import { normalize } from './helpers.js';
+import config from '../config.js';
 
-// JavaScript
-// source: https://www.kaggle.com/crawford/emnist?select=emnist-byclass-mapping.txt
-const emnistMap = [
-  48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73,
-  74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98,
-  99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
-  115, 116, 117, 118, 119, 120, 121, 122,
-];
-// import * as tf from '@tensorflow/tfjs';
+let getPrediction;
+let getNewChar;
 
 const successResultVoiceLines = [
   'Hammer, alter voll geil.',
@@ -46,12 +39,12 @@ const x = 'black',
   y = 10,
   l = 'round';
 
-let model;
-
 let task = '',
   currentTaskCharacter = '';
 
 function init() {
+  loadConfig();
+
   canvas = document.getElementById('can');
   predContainer = document.getElementById('pred-container');
   ctx = canvas.getContext('2d'); // CanvasRenderingContext2D
@@ -126,38 +119,12 @@ function init() {
     false
   );
 
-  loadModel();
-
   predContainer.style.display = 'none';
-}
-
-function execTesseract() {
-  const worker = Tesseract.createWorker({
-    logger: (m) => console.log(m),
-  });
-
-  (async () => {
-    await worker.load();
-    await worker.loadLanguage('grc');
-    await worker.initialize('grc');
-    await worker.setParameters({
-      tessedit_pageseg_mode: 10, // PSM_SINGLE_CHAR
-      tessedit_char_whitelist:
-        'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσΤτΥυΦφΧχΨψΩω',
-    });
-    const {
-      data: { text },
-    } = await worker.recognize(canvas);
-    console.log(text);
-    await worker.terminate();
-  })();
 }
 
 function onSubmit() {
   predContainer.style.display = 'inline-flex';
   predContainer.style.margin = '1rem';
-
-  execTesseract();
 
   predict();
 }
@@ -168,12 +135,6 @@ function onSave() {
   link.href = canvas.toDataURL()
   link.click();
   link.delete;
-}
-
-async function loadModel() {
-  model = await tf.loadLayersModel('./model/model.json');
-
-  console.log(model);
 }
 
 function draw() {
@@ -192,22 +153,8 @@ function erase() {
   // document.getElementById('canvasimg').style.display = 'none';
 }
 
-function scale() {
-  // https://stackoverflow.com/a/51348478/6783713
-  const m = document
-    .createElementNS('http://www.w3.org/2000/svg', 'svg')
-    .createSVGMatrix();
-  const p = new Path2D();
-  const t = m.scale(0.1);
-  p.addPath(currPath, t);
-  ctxResized.lineCap = l;
-  ctxResized.lineWidth = 2;
-  ctxResized.stroke(p);
-}
-
 function newTask() {
-  const randomCharIndex = Math.floor(Math.random() * emnistMap.length);
-  const character = String.fromCharCode(emnistMap[randomCharIndex]);
+  const character = getNewChar();
   let charInfo = '';
   if (!isNaN(character * 1)) {
     charInfo += 'eine';
@@ -235,36 +182,10 @@ function speak(text) {
   speechSynthesis.speak(msg);
 }
 
-function predict() {
-  scale();
+async function predict() {
 
-  const imgData = ctxResized.getImageData(
-    0,
-    0,
-    canvasResized.width,
-    canvasResized.height
-  );
+  const { predictedScore, predictedResult } = await getPrediction(canvas);
 
-  const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
-
-  const values = normalize(Uint8Array.from(alphaFilteredData));
-  // console.log('values', values);
-  const x = tf.tensor(values);
-  // console.log('x', x);
-
-  const example = tf.reshape(x, [-1, 28, 28, 1]);
-  // console.log(`example`, example);
-
-  const prediction = model.predict(example);
-  // console.log(`prediction`, prediction);
-
-  prediction.print();
-
-  const flattenedPrediction = prediction.dataSync();
-  console.log(flattenedPrediction);
-
-  const i = flattenedPrediction.indexOf(Math.max(...flattenedPrediction));
-  const predictedResult = String.fromCharCode(emnistMap[i]);
   const isResultCorrect = predictedResult === currentTaskCharacter;
   speak(
     isResultCorrect
@@ -276,14 +197,11 @@ function predict() {
         ]
   );
 
-  // console.log(`i`, i);
-  // console.log(`flattenedPrediction[i]`, flattenedPrediction[i]);
-
   // Append new DOM object
   const tag = document.createElement('p');
   const text = document.createTextNode(
     `Erkannt: '${predictedResult}' Wahrscheinlichkeit: ${(
-      flattenedPrediction[i] * 100
+      predictedScore * 100
     ).toFixed(2)}%`
   );
   const color = isResultCorrect ? 'bg-green-500' : 'bg-red-500';
@@ -325,6 +243,30 @@ function findxy(res, e) {
       currY = e.clientY - canvas.offsetTop;
       draw();
     }
+  }
+}
+
+async function loadConfig() {
+  if (config.alphabet == "greek") {
+    console.log("LOAD GREEK")
+
+    const { loadModel, predictModel, getRandomChar } = await import(
+      "./tesseract/main.js"
+    )
+    getPrediction = predictModel;
+    getNewChar = getRandomChar;
+
+    loadModel();
+  } else {
+    console.log("LOAD LATIN")
+
+    const { loadModel, predictModel, getRandomChar } = await import(
+      "./tensorflow/main.js"
+    )
+    getPrediction = predictModel;
+    getNewChar = getRandomChar;
+
+    loadModel();
   }
 }
 
