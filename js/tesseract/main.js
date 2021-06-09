@@ -25,7 +25,7 @@ export async function predictModel(canvas) {
     console.log(text);
     await worker.terminate();
 
-    const predictedResult = text;
+    const predictedResult = text.trim();
     const predictedScore = 1;
 
     resolve({ predictedScore, predictedResult });

@@ -18,3 +18,7 @@
   stroke: white;
   fill: white;
 }
+
+#can-resized {
+  display: none;
+}

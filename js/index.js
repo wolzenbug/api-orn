@@ -187,6 +187,8 @@ async function predict() {
   const { predictedScore, predictedResult } = await getPrediction(canvas);
 
   const isResultCorrect = predictedResult === currentTaskCharacter;
+
+  /*
   speak(
     isResultCorrect
       ? successResultVoiceLines[
@@ -196,6 +198,7 @@ async function predict() {
           Math.floor(Math.random() * failResultVoiceLines.length)
         ]
   );
+  */
 
   // Append new DOM object
   const tag = document.createElement('p');
