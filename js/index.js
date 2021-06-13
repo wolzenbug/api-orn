@@ -2,6 +2,7 @@ import config from '../config.js';
 
 let getPrediction;
 let getNewChar;
+let showDebugInfo = false;
 
 const successResultVoiceLines = [
   'Hammer, alter voll geil.',
@@ -42,8 +43,8 @@ const x = 'black',
 let task = '',
   currentTaskCharacter = '';
 
-function init() {
-  loadConfig();
+async function init() {
+  await loadConfig();
 
   canvas = document.getElementById('can');
   predContainer = document.getElementById('pred-container');
@@ -53,6 +54,8 @@ function init() {
 
   canvasResized = document.getElementById('can-resized');
   ctxResized = canvasResized.getContext('2d');
+
+  if (!showDebugInfo) canvasResized.style.display = 'none';
 
   canvas.addEventListener(
     'mousemove',
@@ -86,6 +89,11 @@ function init() {
   document.getElementById('btn').addEventListener(
     'click',
     function (e) {
+      if (e.target.innerText === 'Starten') {
+        newTask();
+        e.target.innerText = 'Fertig';
+        return;
+      }
       onSubmit();
     },
     false
@@ -107,6 +115,7 @@ function init() {
   document.getElementById('q').addEventListener(
     'click',
     function (e) {
+      erase();
       newTask();
     },
     false
@@ -132,7 +141,7 @@ function onSubmit() {
 function onSave() {
   var link = document.createElement('a');
   link.download = 'canvas.png';
-  link.href = canvas.toDataURL()
+  link.href = canvas.toDataURL();
   link.click();
   link.delete;
 }
@@ -183,43 +192,44 @@ function speak(text) {
 }
 
 async function predict() {
-
   const { predictedScore, predictedResult } = await getPrediction(canvas);
 
   const isResultCorrect = predictedResult === currentTaskCharacter;
 
-  /*
-  speak(
-    isResultCorrect
-      ? successResultVoiceLines[
-          Math.floor(Math.random() * successResultVoiceLines.length)
-        ]
-      : failResultVoiceLines[
-          Math.floor(Math.random() * failResultVoiceLines.length)
-        ]
-  );
-  */
+  if (showDebugInfo) {
+    speak(
+      isResultCorrect
+        ? successResultVoiceLines[
+            Math.floor(Math.random() * successResultVoiceLines.length)
+          ]
+        : failResultVoiceLines[
+            Math.floor(Math.random() * failResultVoiceLines.length)
+          ]
+    );
+  }
 
   // Append new DOM object
-  const tag = document.createElement('p');
-  const text = document.createTextNode(
-    `Erkannt: '${predictedResult}' Wahrscheinlichkeit: ${(
-      predictedScore * 100
-    ).toFixed(2)}%`
-  );
-  const color = isResultCorrect ? 'bg-green-500' : 'bg-red-500';
-  tag.classList.add(
-    color,
-    'p-1.5',
-    'inline-block',
-    'px-2',
-    'rounded-sm',
-    'shadow-sm'
-  );
+  if (showDebugInfo) {
+    const tag = document.createElement('p');
+    const text = document.createTextNode(
+      `Erkannt: '${predictedResult}' Wahrscheinlichkeit: ${(
+        predictedScore * 100
+      ).toFixed(2)}%`
+    );
+    const color = isResultCorrect ? 'bg-green-500' : 'bg-red-500';
+    tag.classList.add(
+      color,
+      'p-1.5',
+      'inline-block',
+      'px-2',
+      'rounded-sm',
+      'shadow-sm'
+    );
 
-  tag.appendChild(text);
-  const element = document.getElementById('pred-container');
-  element.appendChild(tag);
+    tag.appendChild(text);
+    const element = document.getElementById('pred-container');
+    element.appendChild(tag);
+  }
 }
 
 function findxy(res, e) {
@@ -250,26 +260,31 @@ function findxy(res, e) {
 }
 
 async function loadConfig() {
-  if (config.alphabet == "greek") {
-    console.log("LOAD GREEK")
+  if (config.alphabet == 'greek') {
+    console.log('LOAD GREEK');
 
     const { loadModel, predictModel, getRandomChar } = await import(
-      "./tesseract/main.js"
-    )
+      './tesseract/main.js'
+    );
     getPrediction = predictModel;
     getNewChar = getRandomChar;
 
     loadModel();
   } else {
-    console.log("LOAD LATIN")
+    console.log('LOAD LATIN');
 
     const { loadModel, predictModel, getRandomChar } = await import(
-      "./tensorflow/main.js"
-    )
+      './tensorflow/main.js'
+    );
     getPrediction = predictModel;
     getNewChar = getRandomChar;
 
     loadModel();
+  }
+
+  if (config.debug) {
+    console.log('DEBUG MODE ACTIVE');
+    showDebugInfo = config.debug;
   }
 }
 

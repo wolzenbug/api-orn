@@ -1,7 +1,7 @@
 :root {
-  --indigo-600: #4F46E5;
+  --indigo-600: #4f46e5;
 
-  --transition-timing-function: cubic-bezier(0.4,0,0.2,1);
+  --transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-duration: 150ms;
 }
 
@@ -9,7 +9,7 @@
   stroke: var(--indigo-600);
   fill: var(--indigo-600);
 
-  transition-property: stroke,fill;
+  transition-property: stroke, fill;
   transition-timing-function: var(--transition-timing-function);
   transition-duration: var(--transition-duration);
 }
@@ -18,7 +18,7 @@
   stroke: white;
   fill: white;
 }
-
+/* 
 #can-resized {
   display: none;
-}
+} */

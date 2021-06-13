@@ -1,11 +1,11 @@
 /**
  * For configuring the application.
- * 
+ *
  * Possible options:
- * 
+ *
  * alphabet: greek/latin (defaults to latin)
  */
-export default
-{
-  "alphabet": "latin",
-}
+export default {
+  alphabet: 'latin',
+  debug: false,
+};
