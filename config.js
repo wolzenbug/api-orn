@@ -6,6 +6,6 @@
  * alphabet: greek/latin (defaults to latin)
  */
 export default {
-  alphabet: 'latin',
-  debug: false,
+  alphabet: 'greek',
+  debug: true,
 };

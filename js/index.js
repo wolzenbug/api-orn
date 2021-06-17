@@ -43,6 +43,8 @@ const x = 'black',
 let task = '',
   currentTaskCharacter = '';
 
+let worker;
+
 async function init() {
   await loadConfig();
 
@@ -191,7 +193,49 @@ function speak(text) {
   speechSynthesis.speak(msg);
 }
 
-async function predict() {
+function predict() {
+  getPrediction(canvas,
+    ({ predictedScore, predictedResult }) => {
+      const isResultCorrect = predictedResult === currentTaskCharacter;
+
+      if (showDebugInfo) {
+        speak(
+          isResultCorrect
+            ? successResultVoiceLines[
+            Math.floor(Math.random() * successResultVoiceLines.length)
+            ]
+            : failResultVoiceLines[
+            Math.floor(Math.random() * failResultVoiceLines.length)
+            ]
+        );
+      }
+
+      // Append new DOM object
+      if (showDebugInfo) {
+        const tag = document.createElement('p');
+        const text = document.createTextNode(
+          `Erkannt: '${predictedResult}' Wahrscheinlichkeit: ${(
+            predictedScore * 100
+          ).toFixed(2)}%`
+        );
+        const color = isResultCorrect ? 'bg-green-500' : 'bg-red-500';
+        tag.classList.add(
+          color,
+          'p-1.5',
+          'inline-block',
+          'px-2',
+          'rounded-sm',
+          'shadow-sm'
+        );
+
+        tag.appendChild(text);
+        const element = document.getElementById('pred-container');
+        element.appendChild(tag);
+      }
+    });
+}
+
+async function predictAsync() {
   const { predictedScore, predictedResult } = await getPrediction(canvas);
 
   const isResultCorrect = predictedResult === currentTaskCharacter;
@@ -200,11 +244,11 @@ async function predict() {
     speak(
       isResultCorrect
         ? successResultVoiceLines[
-            Math.floor(Math.random() * successResultVoiceLines.length)
-          ]
+        Math.floor(Math.random() * successResultVoiceLines.length)
+        ]
         : failResultVoiceLines[
-            Math.floor(Math.random() * failResultVoiceLines.length)
-          ]
+        Math.floor(Math.random() * failResultVoiceLines.length)
+        ]
     );
   }
 
@@ -279,7 +323,7 @@ async function loadConfig() {
     getPrediction = predictModel;
     getNewChar = getRandomChar;
 
-    loadModel();
+    loadModel(canvas);
   }
 
   if (config.debug) {

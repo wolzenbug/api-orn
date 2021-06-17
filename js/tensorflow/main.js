@@ -7,7 +7,7 @@ const emnistMap = [
   115, 116, 117, 118, 119, 120, 121, 122,
 ];
 
-let model;
+let worker;
 
 function getScaledData(canvas, scaleFactor) {
   // https://stackoverflow.com/a/51348478/6783713
@@ -51,43 +51,42 @@ function normalize(array) {
   return normalizedArray;
 }
 
-export async function loadModel() {
-  model = await tf.loadLayersModel('./js/tensorflow/model_emnist/model.json');
+function employWorker(data, callback) {
+  if (window.Worker) {
+    if (!worker) {
+      worker = new Worker('./js/tensorflow/worker.js');
+    }
 
-  console.log(model);
+    worker.onmessage = function (e) {
+      console.log('Message received from worker', e);
+      callback(e.data);
+    }
+
+    worker.postMessage(data);
+    console.log('Message posted to worker', data);
+  }
 }
 
-export async function predictModel(canvas) {
-  return new Promise((resolve, reject) => {
-    const imgData = getScaledData(canvas, 0.1);
+export async function loadModel() {
+  let initPredict = [];
 
-    console.log("IMAGE DATA", imgData);
+  // make dynamic
+  const N = 784;
+  for (let i = 1; i <= N; i++) {
+    initPredict.push(0);
+  }
 
-    const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
+  const callback = (e) => console.log("Initialized Model.")
 
-    const values = normalize(Uint8Array.from(alphaFilteredData));
+  employWorker(initPredict, callback);
+}
 
-    // console.log('values', values);
-    const x = tf.tensor(values);
-    // console.log('x', x);
+export function predictModel(canvas, callback) {
+  const imgData = getScaledData(canvas, 0.1);
+  const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
+  const values = normalize(Uint8Array.from(alphaFilteredData));
 
-    const example = tf.reshape(x, [-1, 28, 28, 1]);
-    // console.log(`example`, example);
-
-    const prediction = model.predict(example);
-    // console.log(`prediction`, prediction);
-
-    prediction.print();
-
-    const flattenedPrediction = prediction.dataSync();
-    console.log(flattenedPrediction);
-
-    const i = flattenedPrediction.indexOf(Math.max(...flattenedPrediction));
-    const predictedScore = flattenedPrediction[i];
-    const predictedResult = String.fromCharCode(emnistMap[i]);
-
-    resolve({ predictedScore, predictedResult });
-  });
+  employWorker(values, callback);
 }
 
 export function getMap() {
@@ -96,6 +95,6 @@ export function getMap() {
 
 export function getRandomChar() {
   return String.fromCharCode(
-    emnistMap[Math.floor((Math.random()*emnistMap.length))]
+    emnistMap[Math.floor((Math.random() * emnistMap.length))]
   );
 }
