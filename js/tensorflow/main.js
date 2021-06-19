@@ -1,3 +1,6 @@
+
+import canvasInstance from "../canvas.js";
+
 // source: https://www.kaggle.com/crawford/emnist?select=emnist-byclass-mapping.txt
 // Outsource for different models
 const emnistMap = [
@@ -8,40 +11,6 @@ const emnistMap = [
 ];
 
 let worker;
-
-function getScaledData(canvas, scaleFactor) {
-  // https://stackoverflow.com/a/51348478/6783713
-  // const m = document
-  //   .createElementNS('http://www.w3.org/2000/svg', 'svg')
-  //   .createSVGMatrix();
-  // const p = new Path2D();
-  // const t = m.scale(0.1);
-  // p.addPath(currPath, t);
-  // ctxResized.lineCap = l;
-  // ctxResized.lineWidth = 2;
-  // ctxResized.stroke(p);
-
-  const copy = document.createElement('canvas');
-  const copyContext = copy.getContext('2d');
-
-  copy.width = canvas.width;
-  copy.height = canvas.height;
-
-  copyContext.scale(scaleFactor, scaleFactor);
-  copyContext.drawImage(canvas, 0, 0);
-
-  const canResizedContext = document.getElementById('can-resized').getContext('2d');
-  canResizedContext.drawImage(copy, 0, 0);
-
-  copyContext.drawImage
-
-  return copyContext.getImageData(
-    0,
-    0,
-    28,
-    28
-  );;
-}
 
 function normalize(array) {
   const normalizedArray = [];
@@ -70,19 +39,17 @@ function employWorker(data, callback) {
 export async function loadModel() {
   let initPredict = [];
 
-  // make dynamic
   const N = 784;
   for (let i = 1; i <= N; i++) {
     initPredict.push(0);
   }
-
   const callback = (e) => console.log("Initialized Model.")
 
   employWorker(initPredict, callback);
 }
 
 export function predictModel(canvas, callback) {
-  const imgData = getScaledData(canvas, 0.1);
+  const imgData = canvasInstance.getScaledData(0.1);
   const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
   const values = normalize(Uint8Array.from(alphaFilteredData));
 

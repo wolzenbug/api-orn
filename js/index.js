@@ -1,5 +1,7 @@
 import config from '../config.js';
 
+import canvasInstance from "./canvas.js";
+
 let getPrediction;
 let getNewChar;
 let showDebugInfo = false;
@@ -22,113 +24,95 @@ const failResultVoiceLines = [
   'Jetzt gib dir doch mal Mühe!',
 ];
 
-let canvas,
-  canvasResized,
-  ctx,
-  ctxResized,
-  w = 0,
-  h = 0,
-  flag = false,
-  prevX = 0,
-  currX = 0,
-  prevY = 0,
-  currY = 0,
-  predContainer,
-  currPath = new Path2D();
-
-const x = 'black',
-  y = 10,
-  l = 'round';
-
-let task = '',
+let predContainer,
+  task = '',
   currentTaskCharacter = '';
 
-let worker;
-
 async function init() {
-  await loadConfig();
+  try {
+    await loadConfig();
 
-  canvas = document.getElementById('can');
-  predContainer = document.getElementById('pred-container');
-  ctx = canvas.getContext('2d'); // CanvasRenderingContext2D
-  w = canvas.width;
-  h = canvas.height;
+    predContainer = document.getElementById('pred-container')
 
-  canvasResized = document.getElementById('can-resized');
-  ctxResized = canvasResized.getContext('2d');
+    if (!showDebugInfo) canvasInstance.hideCanvasResized();
 
-  if (!showDebugInfo) canvasResized.style.display = 'none';
+    const canvas = canvasInstance.getCanvas();
 
-  canvas.addEventListener(
-    'mousemove',
-    function (e) {
-      findxy('move', e);
-    },
-    false
-  );
-  canvas.addEventListener(
-    'mousedown',
-    function (e) {
-      findxy('down', e);
-    },
-    false
-  );
-  canvas.addEventListener(
-    'mouseup',
-    function (e) {
-      findxy('up', e);
-    },
-    false
-  );
-  canvas.addEventListener(
-    'mouseout',
-    function (e) {
-      findxy('out', e);
-    },
-    false
-  );
+    canvas.addEventListener(
+      'mousemove',
+      function (e) {
+        canvasInstance.findxy('move', e);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'mousedown',
+      function (e) {
+        canvasInstance.findxy('down', e);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'mouseup',
+      function (e) {
+        canvasInstance.findxy('up', e);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'mouseout',
+      function (e) {
+        canvasInstance.findxy('out', e);
+      },
+      false
+    );
 
-  document.getElementById('btn').addEventListener(
-    'click',
-    function (e) {
-      if (e.target.innerText === 'Starten') {
+    document.getElementById('btn').addEventListener(
+      'click',
+      function (e) {
+        if (e.target.innerText === 'Starten') {
+          newTask();
+          e.target.innerText = 'Fertig';
+          return;
+        }
+        onSubmit();
+      },
+      false
+    );
+    document.getElementById('clr').addEventListener(
+      'click',
+      function (e) {
+        canvasInstance.erase();
+      },
+      false
+    );
+    document.getElementById('r').addEventListener(
+      'click',
+      function (e) {
+        speak(task);
+      },
+      false
+    );
+    document.getElementById('q').addEventListener(
+      'click',
+      function (e) {
+        canvasInstance.erase();
         newTask();
-        e.target.innerText = 'Fertig';
-        return;
-      }
-      onSubmit();
-    },
-    false
-  );
-  document.getElementById('clr').addEventListener(
-    'click',
-    function (e) {
-      erase();
-    },
-    false
-  );
-  document.getElementById('r').addEventListener(
-    'click',
-    function (e) {
-      speak(task);
-    },
-    false
-  );
-  document.getElementById('q').addEventListener(
-    'click',
-    function (e) {
-      erase();
-      newTask();
-    },
-    false
-  );
-  document.getElementById('s').addEventListener(
-    'click',
-    function (e) {
-      onSave();
-    },
-    false
-  );
+      },
+      false
+    );
+    document.getElementById('s').addEventListener(
+      'click',
+      function (e) {
+        canvasInstance.save();
+      },
+      false
+    );
+  } catch (error) {
+    console.error(error);
+
+    // TODO DISPLAY ERROR MESSAGE
+  }
 
   predContainer.style.display = 'none';
 }
@@ -138,30 +122,6 @@ function onSubmit() {
   predContainer.style.margin = '1rem';
 
   predict();
-}
-
-function onSave() {
-  var link = document.createElement('a');
-  link.download = 'canvas.png';
-  link.href = canvas.toDataURL();
-  link.click();
-  link.delete;
-}
-
-function draw() {
-  currPath.moveTo(prevX, prevY);
-  currPath.lineTo(currX, currY);
-  ctx.strokeStyle = x;
-  ctx.lineWidth = y;
-  ctx.lineCap = l;
-  ctx.stroke(currPath);
-}
-
-function erase() {
-  ctx.clearRect(0, 0, w, h);
-  ctxResized.clearRect(0, 0, w, h);
-  currPath = new Path2D();
-  // document.getElementById('canvasimg').style.display = 'none';
 }
 
 function newTask() {
@@ -194,7 +154,7 @@ function speak(text) {
 }
 
 function predict() {
-  getPrediction(canvas,
+  getPrediction(canvasInstance.getCanvas(),
     ({ predictedScore, predictedResult }) => {
       const isResultCorrect = predictedResult === currentTaskCharacter;
 
@@ -235,74 +195,6 @@ function predict() {
     });
 }
 
-async function predictAsync() {
-  const { predictedScore, predictedResult } = await getPrediction(canvas);
-
-  const isResultCorrect = predictedResult === currentTaskCharacter;
-
-  if (showDebugInfo) {
-    speak(
-      isResultCorrect
-        ? successResultVoiceLines[
-        Math.floor(Math.random() * successResultVoiceLines.length)
-        ]
-        : failResultVoiceLines[
-        Math.floor(Math.random() * failResultVoiceLines.length)
-        ]
-    );
-  }
-
-  // Append new DOM object
-  if (showDebugInfo) {
-    const tag = document.createElement('p');
-    const text = document.createTextNode(
-      `Erkannt: '${predictedResult}' Wahrscheinlichkeit: ${(
-        predictedScore * 100
-      ).toFixed(2)}%`
-    );
-    const color = isResultCorrect ? 'bg-green-500' : 'bg-red-500';
-    tag.classList.add(
-      color,
-      'p-1.5',
-      'inline-block',
-      'px-2',
-      'rounded-sm',
-      'shadow-sm'
-    );
-
-    tag.appendChild(text);
-    const element = document.getElementById('pred-container');
-    element.appendChild(tag);
-  }
-}
-
-function findxy(res, e) {
-  if (res == 'down') {
-    prevX = currX;
-    prevY = currY;
-    currX = e.clientX - canvas.offsetLeft;
-    currY = e.clientY - canvas.offsetTop;
-
-    flag = true;
-    ctx.beginPath();
-    ctx.fillStyle = x;
-    ctx.fillRect(currX, currY, 2, 2);
-    ctx.closePath();
-  }
-  if (res == 'up' || res == 'out') {
-    flag = false;
-  }
-  if (res == 'move') {
-    if (flag) {
-      prevX = currX;
-      prevY = currY;
-      currX = e.clientX - canvas.offsetLeft;
-      currY = e.clientY - canvas.offsetTop;
-      draw();
-    }
-  }
-}
-
 async function loadConfig() {
   if (config.alphabet == 'greek') {
     console.log('LOAD GREEK');
@@ -323,7 +215,7 @@ async function loadConfig() {
     getPrediction = predictModel;
     getNewChar = getRandomChar;
 
-    loadModel(canvas);
+    loadModel(canvasInstance.getCanvas());
   }
 
   if (config.debug) {
