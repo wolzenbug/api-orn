@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+
+<title>API ORN - Trainingsmodus</title>
+
+<head>
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+    rel="stylesheet" />
+  <script type="module" src="./js/training.js"></script>
+</head>
+
+<body>
+  <div class="m-6">
+    <div class="bg-gray-50 inline-block p-2 rounded-sm shadow-sm">
+      <div class="
+            flex flex-col
+            space-y-2
+            justify-center
+            rounded-md
+            mb-2
+            p-2
+            bg-indigo-600
+          ">
+        <input class="text-white" id="csv" type="file" />
+      </div>
+
+      <div class="
+            flex flex-col
+            space-y-2
+            justify-center
+            border border-gray-300
+            rounded-md
+          ">
+        <div id="taskContainer" class="
+              text-gray-700
+              flex flex-row
+              items-center
+              text-center
+              border-b
+            ">
+          <label for="current-char" class="font-medium p-2">Zeichen
+            auswählen:</label>
+          <select name="current-char" class="font-medium"
+            id="current-char"></select>
+        </div>
+        <canvas id="can" width="280" height="280"
+          class="bg-white rounded-md border mx-2"></canvas>
+        <div class="flex justify-between px-2 pb-2">
+          <div class="h-8 space-x-2">
+            <button type="button" id="clr" class="
+                  bg-red-600
+                  h-8
+                  p-1
+                  px-2
+                  rounded-sm
+                  text-white
+                  transition
+                  hover:bg-red-500
+                  focus:outline-none
+                ">
+              <svg stroke="currentColor" fill="currentColor"
+                stroke-width="0" viewBox="0 0 24 24" height="1em"
+                width="1em" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <path fill="none" d="M0 0h24v24H0z"></path>
+                  <path
+                    d="M14 19h7v2h-9l-3.998.002-6.487-6.487a1 1 0 0 1 0-1.414L12.12 2.494a1 1 0 0 1 1.415 0l7.778 7.778a1 1 0 0 1 0 1.414L14 19zm1.657-4.485l3.535-3.536-6.364-6.364-3.535 3.536 6.364 6.364z">
+                  </path>
+                </g>
+              </svg>
+            </button>
+            <button type="button" id="s" class="
+                  bg-yellow-500
+                  h-8
+                  p-1
+                  px-2
+                  rounded-sm
+                  text-white
+                  transition
+                  hover:bg-yellow-400
+                  focus:outline-none
+                ">
+              <svg stroke="currentColor" fill="currentColor"
+                stroke-width="0" viewBox="0 0 24 24" height="1em"
+                width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z">
+                </path>
+              </svg>
+            </button>
+          </div>
+
+          <button type="button" id="btn" class="
+                bg-green-600
+                p-1
+                px-3
+                rounded-sm
+                text-white
+                transition
+                hover:bg-green-500
+                focus:outline-none
+              ">
+            Fertig
+          </button>
+        </div>
+      </div>
+
+      <p class="font-medium py-2">Anzahl bisherige Daten:</p>
+      <table id="data" class="table-fixed border border-gray-300 rounded-md border-separate"></table>
+    </div>
+  </div>
+</body>
+
+</html>

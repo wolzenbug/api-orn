@@ -12,14 +12,6 @@ const emnistMap = [
 
 let worker;
 
-function normalize(array) {
-  const normalizedArray = [];
-  for (let i = 0; i < array.length; i++) {
-    normalizedArray.push(array[i] / 255);
-  }
-  return normalizedArray;
-}
-
 function employWorker(data, callback) {
   if (window.Worker) {
     if (!worker) {
@@ -50,10 +42,8 @@ export async function loadModel() {
 
 export function predictModel(canvas, callback) {
   const imgData = canvasInstance.getScaledData(0.1);
-  const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
-  const values = normalize(Uint8Array.from(alphaFilteredData));
 
-  employWorker(values, callback);
+  employWorker(imgData, callback);
 }
 
 export function getMap() {

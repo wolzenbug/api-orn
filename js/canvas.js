@@ -20,8 +20,16 @@ ctx = canvas.getContext('2d');
 w = canvas.width;
 h = canvas.height;
 
-canvasResized = document.getElementById('can-resized');
-ctxResized = canvasResized.getContext('2d');
+// canvasResized = document.getElementById('can-resized');
+// ctxResized = canvasResized.getContext('2d');
+
+function normalize(array) {
+  const normalizedArray = [];
+  for (let i = 0; i < array.length; i++) {
+    normalizedArray.push(array[i] / 255);
+  }
+  return normalizedArray;
+}
 
 function draw() {
   currPath.moveTo(prevX, prevY);
@@ -52,20 +60,25 @@ export default {
     copy.width = canvas.width * scaleFactor;
     copy.height = canvas.height * scaleFactor;
 
-    ctxResized.lineCap = l;
-    ctxResized.lineWidth = 2;
-    ctxResized.stroke(p);
+    // ctxResized.lineCap = l;
+    // ctxResized.lineWidth = 2;
+    // ctxResized.stroke(p);
 
     copyContext.lineCap = l;
     copyContext.lineWidth = 2;
     copyContext.stroke(p);
 
-    return copyContext.getImageData(
+    const imgData = copyContext.getImageData(
       0,
       0,
       28,
       28
     );
+
+    const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
+    const values = normalize(Uint8Array.from(alphaFilteredData));
+
+    return values;
   },
   save() {
     var link = document.createElement('a');
@@ -75,7 +88,7 @@ export default {
     link.delete;
   },
   hideCanvasResized() {
-    canvasResized.style.display = 'none';
+    // canvasResized.style.display = 'none';
   },
   findxy(res, e) {
     if (res == 'down') {
@@ -105,7 +118,7 @@ export default {
   },
   erase() {
     ctx.clearRect(0, 0, w, h);
-    ctxResized.clearRect(0, 0, w, h);
+    // ctxResized.clearRect(0, 0, w, h);
     currPath = new Path2D();
     // document.getElementById('canvasimg').style.display = 'none';
   }
