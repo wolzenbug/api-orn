@@ -113,7 +113,7 @@ function exportDataAsCSV() {
         content += `${values[i].join(';')}`
       } 
       
-      if (i <= values.length) {
+      if (key != chars[chars.length - 1]) {
         content += ',';
       }
     }
