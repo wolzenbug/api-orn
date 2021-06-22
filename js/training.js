@@ -2,12 +2,16 @@ import canvasInstance from "./canvas.js";
 
 let input,
   select,
+  selectLabel,
+  currentCountContainer,
   table,
   data = {},
   chars = [];
 
 function init() {
   input = document.getElementById("csv");
+  currentCountContainer = document.getElementById("current-count-container");
+  selectLabel = document.getElementById("select-label");
   select = document.getElementById("current-char");
   table = document.getElementById("data");
 
@@ -26,6 +30,9 @@ function init() {
   input.addEventListener(
     'change',
     function (e) {
+      currentCountContainer.style.display = 'block';
+      selectLabel.innerHTML = input.files[0].name;
+
       reader.readAsBinaryString(input.files[0]);
     });
 
@@ -103,8 +110,10 @@ function exportDataAsCSV() {
       const values = data[key];
 
       if(i < values.length) {
-        content += `${values[i].join(';')},`
-      } else {
+        content += `${values[i].join(';')}`
+      } 
+      
+      if (i <= values.length) {
         content += ',';
       }
     }

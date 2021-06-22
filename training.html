@@ -15,25 +15,24 @@
   <div class="m-6">
     <div class="bg-gray-50 inline-block p-2 rounded-sm shadow-sm">
       <div class="
-            flex flex-col
-            space-y-2
-            justify-center
-            rounded-md
-            mb-2
-            p-2
-            bg-indigo-600
-          ">
-        <input class="text-white" id="csv" type="file" />
+        mb-2
+        rounded-md
+        bg-indigo-600
+      ">
+        <label class="text-white w-full h-full block p-2 cursor-pointer"
+          for="csv" id="select-label">Datei
+          hochladen...</label>
+        <input class="hidden" id="csv" type="file" />
       </div>
 
-      <div class="
+      <div id="canvas-container" class="
             flex flex-col
             space-y-2
             justify-center
             border border-gray-300
             rounded-md
           ">
-        <div id="taskContainer" class="
+        <div class="
               text-gray-700
               flex flex-row
               items-center
@@ -106,10 +105,41 @@
         </div>
       </div>
 
-      <p class="font-medium py-2">Anzahl bisherige Daten:</p>
-      <table id="data" class="table-fixed border border-gray-300 rounded-md border-separate"></table>
+      <div id="current-count-container" style="display: none;">
+        <p class="font-medium py-2">Anzahl bisherige Daten:</p>
+        <div id="table-container">
+          <table id="data">
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </body>
 
 </html>
+
+<style>
+  #table-container {
+    max-width: 300px;
+    border: 1px solid rgb(209, 213, 219);
+    border-radius: .375rem;
+  }
+
+  #table-container table#data {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  #table-container table#data th {
+    background-color: rgb(209, 213, 219);
+  }
+
+  #table-container table#data td {
+    text-align: center;
+  }
+
+  #table-container table#data td:not(:last-of-type) {
+    border-right: 1px solid rgb(209, 213, 219);
+  }
+</style>
