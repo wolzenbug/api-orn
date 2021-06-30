@@ -20,9 +20,6 @@ ctx = canvas.getContext('2d');
 w = canvas.width;
 h = canvas.height;
 
-// canvasResized = document.getElementById('can-resized');
-// ctxResized = canvasResized.getContext('2d');
-
 function normalize(array) {
   const normalizedArray = [];
   for (let i = 0; i < array.length; i++) {
@@ -68,12 +65,7 @@ export default {
     copyContext.lineWidth = 2;
     copyContext.stroke(p);
 
-    const imgData = copyContext.getImageData(
-      0,
-      0,
-      28,
-      28
-    );
+    const imgData = copyContext.getImageData(0, 0, 28, 28);
 
     const alphaFilteredData = imgData.data.filter((d, i) => (i + 1) % 4 === 0);
     const values = normalize(Uint8Array.from(alphaFilteredData));
@@ -121,5 +113,5 @@ export default {
     // ctxResized.clearRect(0, 0, w, h);
     currPath = new Path2D();
     // document.getElementById('canvasimg').style.display = 'none';
-  }
-}
+  },
+};

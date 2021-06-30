@@ -1,6 +1,6 @@
 import config from '../config.js';
 
-import canvasInstance from "./canvas.js";
+import canvasInstance from './canvas.js';
 
 let getPrediction;
 let getNewChar;
@@ -24,17 +24,9 @@ const failResultVoiceLines = [
   'Jetzt gib dir doch mal Mühe!',
 ];
 
-let predContainer,
-  task = '',
-  currentTaskCharacter = '';
-
 async function init() {
   try {
     await loadConfig();
-
-    predContainer = document.getElementById('pred-container')
-
-    if (!showDebugInfo) canvasInstance.hideCanvasResized();
 
     const canvas = canvasInstance.getCanvas();
 
@@ -71,6 +63,10 @@ async function init() {
       'click',
       function (e) {
         if (e.target.innerText === 'Starten') {
+          // Removing shade and adding white background
+          canvas.classList.remove('bg-gray-200');
+          canvas.classList.add('bg-white');
+
           newTask();
           e.target.innerText = 'Fertig';
           return;
@@ -101,7 +97,23 @@ async function init() {
       },
       false
     );
-    document.getElementById('s').addEventListener(
+    const modalPrimaryButton = document.getElementById('modalPrimaryButton');
+    modalPrimaryButton.addEventListener(
+      'click',
+      function (e) {
+        toggleModalVisibility();
+        canvasInstance.erase();
+
+        modalPrimaryButton.classList.remove(
+          'bg-green-600',
+          'hover:bg-green-700'
+        );
+        modalPrimaryButton.classList.remove('bg-red-600', 'hover:bg-red-700');
+        newTask();
+      },
+      false
+    );
+    document.getElementById('modalSecondaryButton').addEventListener(
       'click',
       function (e) {
         canvasInstance.save();
@@ -117,10 +129,33 @@ async function init() {
   predContainer.style.display = 'none';
 }
 
-function onSubmit() {
-  predContainer.style.display = 'inline-flex';
-  predContainer.style.margin = '1rem';
+function toggleModalVisibility() {
+  document.getElementById('dialog').classList.toggle('hidden');
+}
 
+function showModal(success, prediction, predictionAccuracy) {
+  const modalTitle = document.getElementById('modal-title');
+  const pred = document.getElementById('prediction');
+  const acc = document.getElementById('accuracy');
+  const primaryBtn = document.getElementById('modalPrimaryButton');
+
+  // Setup modal content
+  const successColor = success ? 'green' : 'red';
+  primaryBtn.classList.add(
+    `bg-${successColor}-600`,
+    `hover:bg-${successColor}-700`
+  );
+  modalTitle.innerText = success ? 'Richtig' : 'Falsch';
+  pred.innerText = prediction && `Erkanntes Zeichen: ${prediction}`;
+  acc.innerText =
+    predictionAccuracy &&
+    `Sicherheit: ${(predictionAccuracy * 100).toFixed(2)}%`;
+
+  // Show modal
+  toggleModalVisibility();
+}
+
+function onSubmit() {
   predict();
 }
 
@@ -154,7 +189,8 @@ function speak(text) {
 }
 
 function predict() {
-  getPrediction(canvasInstance.getCanvas(),
+  getPrediction(
+    canvasInstance.getCanvas(),
     ({ predictedScore, predictedResult }) => {
       const isResultCorrect = predictedResult === currentTaskCharacter;
 
@@ -162,37 +198,17 @@ function predict() {
         speak(
           isResultCorrect
             ? successResultVoiceLines[
-            Math.floor(Math.random() * successResultVoiceLines.length)
-            ]
+                Math.floor(Math.random() * successResultVoiceLines.length)
+              ]
             : failResultVoiceLines[
-            Math.floor(Math.random() * failResultVoiceLines.length)
-            ]
+                Math.floor(Math.random() * failResultVoiceLines.length)
+              ]
         );
       }
 
-      // Append new DOM object
-      if (showDebugInfo) {
-        const tag = document.createElement('p');
-        const text = document.createTextNode(
-          `Erkannt: '${predictedResult}' Wahrscheinlichkeit: ${(
-            predictedScore * 100
-          ).toFixed(2)}%`
-        );
-        const color = isResultCorrect ? 'bg-green-500' : 'bg-red-500';
-        tag.classList.add(
-          color,
-          'p-1.5',
-          'inline-block',
-          'px-2',
-          'rounded-sm',
-          'shadow-sm'
-        );
-
-        tag.appendChild(text);
-        const element = document.getElementById('pred-container');
-        element.appendChild(tag);
-      }
-    });
+      showModal(isResultCorrect, predictedResult, predictedScore);
+    }
+  );
 }
 
 async function loadConfig() {
