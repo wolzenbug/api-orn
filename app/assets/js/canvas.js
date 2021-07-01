@@ -57,10 +57,6 @@ export default {
     copy.width = canvas.width * scaleFactor;
     copy.height = canvas.height * scaleFactor;
 
-    // ctxResized.lineCap = l;
-    // ctxResized.lineWidth = 2;
-    // ctxResized.stroke(p);
-
     copyContext.lineCap = l;
     copyContext.lineWidth = 2;
     copyContext.stroke(p);
@@ -78,9 +74,6 @@ export default {
     link.href = canvas.toDataURL();
     link.click();
     link.delete;
-  },
-  hideCanvasResized() {
-    // canvasResized.style.display = 'none';
   },
   findxy(res, e) {
     if (res == 'down') {
@@ -110,8 +103,6 @@ export default {
   },
   erase() {
     ctx.clearRect(0, 0, w, h);
-    // ctxResized.clearRect(0, 0, w, h);
     currPath = new Path2D();
-    // document.getElementById('canvasimg').style.display = 'none';
   },
 };

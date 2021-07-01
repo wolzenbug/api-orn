@@ -1,6 +1,6 @@
 
 import canvasInstance from "../canvas.js";
-import config from "../../config.js";
+import config from "../config.js";
 
 // source: https://www.kaggle.com/crawford/emnist?select=emnist-byclass-mapping.txt
 // Outsource for different models
@@ -20,7 +20,7 @@ let worker;
 function employWorker(data, callback) {
   if (window.Worker) {
     if (!worker) {
-      worker = new Worker('./js/tensorflow/worker.js');
+      worker = new Worker('./static/js/tensorflow/worker.js');
     }
 
     worker.onmessage = function (e) {
