@@ -6,6 +6,8 @@ let getPrediction;
 let getNewChar;
 let showDebugInfo = false;
 
+let currentTaskCharacter, task;
+
 const successResultVoiceLines = [
   'Hammer, alter voll geil.',
   'Mega gut!',
@@ -125,8 +127,6 @@ async function init() {
 
     // TODO DISPLAY ERROR MESSAGE
   }
-
-  predContainer.style.display = 'none';
 }
 
 function toggleModalVisibility() {
@@ -213,7 +213,7 @@ function predict() {
 
 async function loadConfig() {
   if (config.alphabet == 'greek') {
-    console.log('LOAD GREEK');
+    console.log('LOAD TESSERACT');
 
     const { loadModel, predictModel, getRandomChar } = await import(
       './tesseract/main.js'
@@ -223,7 +223,7 @@ async function loadConfig() {
 
     loadModel();
   } else {
-    console.log('LOAD LATIN');
+    console.log('LOAD TENSORFLOW');
 
     const { loadModel, predictModel, getRandomChar } = await import(
       './tensorflow/main.js'
