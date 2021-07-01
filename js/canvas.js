@@ -20,9 +20,6 @@ ctx = canvas.getContext('2d');
 w = canvas.width;
 h = canvas.height;
 
-// canvasResized = document.getElementById('can-resized');
-// ctxResized = canvasResized.getContext('2d');
-
 function normalize(array) {
   const normalizedArray = [];
   for (let i = 0; i < array.length; i++) {
