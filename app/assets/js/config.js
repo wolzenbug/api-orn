@@ -6,7 +6,8 @@
  * alphabet: greek/latin/arithmetic (defaults to latin)
  */
 export default {
-  alphabet: 'arithmetic',
-  modelPath: "./model_java_op/model.json",
-  debug: true,
+  modelPaths: {
+    arithmetic: "./model_java_op/model.json",
+    latin: "./model_emnist/model.json"
+  },
 };

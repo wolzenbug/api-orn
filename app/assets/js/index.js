@@ -1,5 +1,3 @@
-import config from './config.js';
-
 import canvasInstance from './canvas.js';
 
 let getPrediction;
@@ -212,7 +210,7 @@ function predict() {
 }
 
 async function loadConfig() {
-  if (config.alphabet == 'greek') {
+  if (lang == 'greek') {
     console.log('LOAD TESSERACT');
 
     const { loadModel, predictModel, getRandomChar } = await import(
@@ -232,11 +230,6 @@ async function loadConfig() {
     getNewChar = getRandomChar;
 
     loadModel(canvasInstance.getCanvas());
-  }
-
-  if (config.debug) {
-    console.log('DEBUG MODE ACTIVE');
-    showDebugInfo = config.debug;
   }
 }
 
