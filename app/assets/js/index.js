@@ -1,4 +1,5 @@
 import canvasInstance from './canvas.js';
+import { isString } from './helpers.js';
 
 let getPrediction;
 let getNewChar;
@@ -196,11 +197,11 @@ function predict() {
         speak(
           isResultCorrect
             ? successResultVoiceLines[
-                Math.floor(Math.random() * successResultVoiceLines.length)
-              ]
+            Math.floor(Math.random() * successResultVoiceLines.length)
+            ]
             : failResultVoiceLines[
-                Math.floor(Math.random() * failResultVoiceLines.length)
-              ]
+            Math.floor(Math.random() * failResultVoiceLines.length)
+            ]
         );
       }
 
@@ -210,26 +211,33 @@ function predict() {
 }
 
 async function loadConfig() {
-  if (lang == 'greek') {
-    console.log('LOAD TESSERACT');
+  const lang = canvasInstance.getLanguage();
+  const t = canvasInstance.getTech();
 
-    const { loadModel, predictModel, getRandomChar } = await import(
-      './tesseract/main.js'
-    );
-    getPrediction = predictModel;
-    getNewChar = getRandomChar;
+  if (isString(lang) && isString(t)) {
+    {
+      if (t == 'tsr') {
+        console.log('LOAD TESSERACT');
 
-    loadModel();
-  } else {
-    console.log('LOAD TENSORFLOW');
+        const { loadModel, predictModel, getRandomChar } = await import(
+          './tesseract/main.js'
+        );
+        getPrediction = predictModel;
+        getNewChar = getRandomChar;
 
-    const { loadModel, predictModel, getRandomChar } = await import(
-      './tensorflow/main.js'
-    );
-    getPrediction = predictModel;
-    getNewChar = getRandomChar;
+        loadModel(lang);
+      } else if (t == 'tf') {
+        console.log('LOAD TENSORFLOW');
 
-    loadModel(canvasInstance.getCanvas());
+        const { loadModel, predictModel, getRandomChar } = await import(
+          './tensorflow/main.js'
+        );
+        getPrediction = predictModel;
+        getNewChar = getRandomChar;
+
+        loadModel(lang);
+      }
+    }
   }
 }
 

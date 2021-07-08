@@ -105,4 +105,10 @@ export default {
     ctx.clearRect(0, 0, w, h);
     currPath = new Path2D();
   },
+  getLanguage() {
+    return canvas.getAttribute('lang');
+  },
+  getTech() {
+    return canvas.getAttribute('t');
+  }
 };
