@@ -1,29 +1,15 @@
 import canvasInstance from './canvas.js';
 import { isString } from './helpers.js';
+import localeLangMaps from './languagemaps.js';
+import config from './config.js';
+
+const locale = 'de-DE';
+const TESSERACT = 'tsr';
+const TENSORFLOW = 'tf';
 
 let getPrediction;
 let getNewChar;
-let showDebugInfo = false;
-
-let currentTaskCharacter, task;
-
-const successResultVoiceLines = [
-  'Hammer, alter voll geil.',
-  'Mega gut!',
-  'Sie sind einfach ultra cool.',
-  'Wie kann man nur so genial sein?',
-  'Sehr professionell!',
-  'Gut gemacht, weiter so!',
-];
-
-const failResultVoiceLines = [
-  'Oh scheiße, das war nix.',
-  'Nicht ganz korrekt, versuchs noch einmal.',
-  "Geht's noch?",
-  'Noch einmal, jetzt!',
-  'Diesmal vielleicht richtig?',
-  'Jetzt gib dir doch mal Mühe!',
-];
+let currentTaskCharacter, taskText;
 
 async function init() {
   try {
@@ -86,7 +72,7 @@ async function init() {
     document.getElementById('r').addEventListener(
       'click',
       function (e) {
-        speak(task);
+        speak(taskText);
       },
       false
     );
@@ -121,11 +107,33 @@ async function init() {
       },
       false
     );
+
+    const taskField = document.getElementById('taskField');
+    switch (config.kState) {
+      case 'r':
+        taskField.classList.add(`hidden`);
+        break;
+      case 't':
+        break;
+      case 'rt':
+        break;
+
+      default:
+        break;
+    }
   } catch (error) {
     console.error(error);
 
     // TODO DISPLAY ERROR MESSAGE
   }
+}
+
+function localizeAndMapCharacter(char) {
+  const lang = canvasInstance.getLanguage();
+  const localizedChar = localeLangMaps[locale][lang].find(
+    (charMap) => charMap[char]
+  )[char];
+  return localizedChar;
 }
 
 function toggleModalVisibility() {
@@ -135,7 +143,7 @@ function toggleModalVisibility() {
 function showModal(success, prediction, predictionAccuracy) {
   const modalTitle = document.getElementById('modal-title');
   const pred = document.getElementById('prediction');
-  const acc = document.getElementById('accuracy');
+  const taskChar = document.getElementById('taskchar');
   const primaryBtn = document.getElementById('modalPrimaryButton');
 
   // Setup modal content
@@ -144,11 +152,16 @@ function showModal(success, prediction, predictionAccuracy) {
     `bg-${successColor}-600`,
     `hover:bg-${successColor}-700`
   );
-  modalTitle.innerText = success ? 'Richtig' : 'Falsch';
-  pred.innerText = prediction && `Erkanntes Zeichen: ${prediction}`;
-  acc.innerText =
-    predictionAccuracy &&
-    `Sicherheit: ${(predictionAccuracy * 100).toFixed(2)}%`;
+  let modalTitleText = success ? 'Richtig' : 'Falsch';
+  pred.innerText = prediction ? `Erkanntes Zeichen: ${prediction}` : '';
+  taskChar.innerText = `Verlangtes Zeichen: ${currentTaskCharacter}`;
+  const t = canvasInstance.getTech();
+  if (t !== TESSERACT) {
+    modalTitleText += predictionAccuracy
+      ? ` (${(predictionAccuracy * 100).toFixed(2)}%)`
+      : '';
+  }
+  modalTitle.innerText = modalTitleText;
 
   // Show modal
   toggleModalVisibility();
@@ -159,27 +172,15 @@ function onSubmit() {
 }
 
 function newTask() {
-  const character = getNewChar();
-  let charInfo = '';
-  if (!isNaN(character * 1)) {
-    charInfo += 'eine';
-  } else {
-    if (character == character.toUpperCase()) {
-      charInfo += 'ein großes';
-    } else if (character == character.toLowerCase()) {
-      charInfo += 'ein kleines';
-    }
-  }
-  currentTaskCharacter = character;
-  task = `Zeichnen Sie ${charInfo} ${character}`;
-  document.getElementById('taskField').innerHTML = task;
-  console.log(`task`, task);
+  currentTaskCharacter = getNewChar();
+  taskText = `Zeichnen Sie ${localizeAndMapCharacter(currentTaskCharacter)}`;
+  document.getElementById('taskField').innerHTML = taskText;
 }
 
 function speak(text) {
   let msg = new SpeechSynthesisUtterance();
   msg.text = text;
-  msg.lang = 'de-DE';
+  msg.lang = locale;
   msg.volume = 0.5; // 0 to 1
   msg.rate = 1; // 0.1 to 10
   msg.pitch = 1; //0 to 2
@@ -191,20 +192,10 @@ function predict() {
   getPrediction(
     canvasInstance.getCanvas(),
     ({ predictedScore, predictedResult }) => {
+      console.log(`currentTaskCharacter`, currentTaskCharacter);
       const isResultCorrect = predictedResult === currentTaskCharacter;
 
-      if (showDebugInfo) {
-        speak(
-          isResultCorrect
-            ? successResultVoiceLines[
-            Math.floor(Math.random() * successResultVoiceLines.length)
-            ]
-            : failResultVoiceLines[
-            Math.floor(Math.random() * failResultVoiceLines.length)
-            ]
-        );
-      }
-
+      console.log(`predictedResult`, predictedResult);
       showModal(isResultCorrect, predictedResult, predictedScore);
     }
   );
@@ -216,7 +207,7 @@ async function loadConfig() {
 
   if (isString(lang) && isString(t)) {
     {
-      if (t == 'tsr') {
+      if (t == TESSERACT) {
         console.log('LOAD TESSERACT');
 
         const { loadModel, predictModel, getRandomChar } = await import(
@@ -226,7 +217,7 @@ async function loadConfig() {
         getNewChar = getRandomChar;
 
         loadModel(lang);
-      } else if (t == 'tf') {
+      } else if (t == TENSORFLOW) {
         console.log('LOAD TENSORFLOW');
 
         const { loadModel, predictModel, getRandomChar } = await import(

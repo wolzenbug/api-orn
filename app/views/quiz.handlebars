@@ -50,7 +50,7 @@
                   id="modal-title"></h3>
                 <div class="mt-2">
                   <p class="text-sm text-gray-500" id="prediction"></p>
-                  <p class="text-sm text-gray-500" id="accuracy"></p>
+                  <p class="text-sm text-gray-500" id="taskchar"></p>
                 </div>
               </div>
             </div>
@@ -119,19 +119,18 @@
               text-center
               border-b
             ">
-        <span id="taskField" class="font-medium text-center p-2">Bitte
-          "Starten" klicken</span>
-        <button type="button" id="r" class="
-                border-l
+             <button type="button" id="r" class="
                 h-10
                 px-2
-                rounded-tr
-                text-white
+                w-full
+                rounded-t
                 flex
                 justify-center
                 items-center
                 transition
+                text-gray-800
                 hover:bg-indigo-500
+                hover:text-white
                 focus:outline-none
                 speaker-button
               ">
@@ -145,7 +144,11 @@
               d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6"
               style="fill: none; stroke-width: 5; stroke-linecap: round" />
           </svg>
+           <span id="taskField" class="p-2">Bitte
+          "Starten" klicken</span>
+       
         </button>
+       
       </div>
       <canvas lang="{{{lang}}}" t="{{{t}}}" id="can" width="280" height="280"
         class="bg-gray-200 rounded-md border mx-2"></canvas>
