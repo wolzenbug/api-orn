@@ -23,6 +23,7 @@ async function init() {
 
     const canvas = canvasInstance.getCanvas();
 
+
     canvas.addEventListener(
       'mousemove',
       function (e) {
@@ -51,6 +52,32 @@ async function init() {
       },
       false
     );
+
+    /* TOUCH DEVICES */
+    canvas.addEventListener("touchmove", function (e) {
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousemove", {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      canvas.dispatchEvent(mouseEvent);
+    }, false);
+    canvas.addEventListener("touchstart", function (e) {
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousedown", {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      canvas.dispatchEvent(mouseEvent);
+    }, false);
+    canvas.addEventListener("touchend", function (e) {
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mouseup", {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      canvas.dispatchEvent(mouseEvent);
+    }, false);
 
     document.getElementById('btn').addEventListener(
       'click',
