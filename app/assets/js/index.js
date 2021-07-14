@@ -7,9 +7,15 @@ const locale = 'de-DE';
 const TESSERACT = 'tsr';
 const TENSORFLOW = 'tf';
 
-let getPrediction;
-let getNewChar;
-let currentTaskCharacter, taskText;
+let getPrediction,
+  getNewChar,
+  currentTaskCharacter,
+  taskText,
+  numTasks,
+  curNumTasks,
+  correctTasks,
+  progressText,
+  progressBar;
 
 async function init() {
   try {
@@ -96,7 +102,33 @@ async function init() {
           'hover:bg-green-700'
         );
         modalPrimaryButton.classList.remove('bg-red-600', 'hover:bg-red-700');
-        newTask();
+
+        curNumTasks++;
+
+        if (numTasks != null) {
+          if(curNumTasks < numTasks) {
+            updateProgress();
+
+            newTask();
+          } else if(curNumTasks === numTasks) {
+            showModalWithEndResult();
+            updateProgress();
+          } else {
+            modalPrimaryButton.classList.remove(`bg-indigo-600`, `hover:bg-indigo-500`);
+
+            modalPrimaryButton.innerText = 'Weiter';
+            document.getElementById('modalSecondaryButton').style.display = 'block';
+
+            curNumTasks = 0;
+            correctTasks = 0;
+
+            updateProgress();
+
+            newTask();
+          }
+        } else {
+          newTask();
+        }
       },
       false
     );
@@ -140,7 +172,7 @@ function toggleModalVisibility() {
   document.getElementById('dialog').classList.toggle('hidden');
 }
 
-function showModal(success, prediction, predictionAccuracy) {
+function showModalWithResult(success, prediction, predictionAccuracy) {
   const modalTitle = document.getElementById('modal-title');
   const pred = document.getElementById('prediction');
   const taskChar = document.getElementById('taskchar');
@@ -162,6 +194,32 @@ function showModal(success, prediction, predictionAccuracy) {
       : '';
   }
   modalTitle.innerText = modalTitleText;
+
+  // Show modal
+  toggleModalVisibility();
+}
+
+function showModalWithEndResult() {
+  const modalTitle = document.getElementById('modal-title');
+  const pred = document.getElementById('prediction');
+  const taskChar = document.getElementById('taskchar');
+  const primaryBtn = document.getElementById('modalPrimaryButton');
+  const secondaryBtn = document.getElementById('modalSecondaryButton');
+
+  // Setup modal content
+  primaryBtn.classList.add(
+    `bg-indigo-600`,
+    `hover:bg-indigo-500`
+  );
+
+  primaryBtn.innerText = 'Neuer Versuch';
+  secondaryBtn.style.display = 'none';
+
+  let modalTitleText = 'Endergebnis';
+
+  pred.innerHTML = `Richtig: ${correctTasks}`;
+  taskChar.innerHTML = `Falsch: ${numTasks - correctTasks}`;
+  modalTitle.innerHTML = modalTitleText;
 
   // Show modal
   toggleModalVisibility();
@@ -196,14 +254,22 @@ function predict() {
       const isResultCorrect = predictedResult === currentTaskCharacter;
 
       console.log(`predictedResult`, predictedResult);
-      showModal(isResultCorrect, predictedResult, predictedScore);
+      showModalWithResult(isResultCorrect, predictedResult, predictedScore);
+
+      if(isResultCorrect) correctTasks++;
     }
   );
+}
+
+function updateProgress() {
+  progressBar.style.width = `${(curNumTasks / numTasks) * 100}%`
+  progressText.innerHTML = `${curNumTasks}/${numTasks}`
 }
 
 async function loadConfig() {
   const lang = canvasInstance.getLanguage();
   const t = canvasInstance.getTech();
+  const r = canvasInstance.getNumberRounds();
 
   if (isString(lang) && isString(t)) {
     {
@@ -229,6 +295,20 @@ async function loadConfig() {
         loadModel(lang);
       }
     }
+  }
+
+  if (r) {
+    numTasks = r;
+    curNumTasks = 0;
+    correctTasks = 0;
+
+    progressText = document.getElementById("progress-text");
+    progressBar = document.getElementById("progress-bar");
+
+    updateProgress();
+
+    document.getElementById('q').style.display = 'none';
+    document.getElementById('progress-container').classList.remove('hidden');
   }
 }
 

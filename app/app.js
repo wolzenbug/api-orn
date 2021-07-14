@@ -12,8 +12,9 @@ app.use('/static', express.static(__dirname + '/assets'));
 
 // EXAMPLE: http://localhost:3000/?lang=latin&t=tf
 app.get('/', (req, res) => {
-  res.locals.lang = req.query.lang;
-  res.locals.t = req.query.t;
+  res.locals.lang = req.query.lang; // language
+  res.locals.t = req.query.t;       // technology (tensorflow/tesseract)
+  res.locals.r = req.query.r;       // number of rounds (opt)
   res.render('quiz');
 });
 

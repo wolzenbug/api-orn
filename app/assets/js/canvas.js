@@ -110,5 +110,10 @@ export default {
   },
   getTech() {
     return canvas.getAttribute('t');
+  },
+  getNumberRounds() {
+    const num = parseInt(canvas.getAttribute('r'));
+
+    return isNaN(num) ? null : num;
   }
 };
