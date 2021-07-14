@@ -3,7 +3,7 @@ var exphbs = require('express-handlebars');
 
 const app = express();
 
-const port = 3000;
+const port = 5000;
 
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
@@ -22,7 +22,7 @@ app.get('/training', (req, res) => {
   res.sendFile(__dirname + '/views/training.html');
 });
 
-app.listen(port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log(`API-ORN dev server listening at http://localhost:${port}`);
   console.log(`Example http://localhost:${port}/?lang=latin&t=tf`);
 });
