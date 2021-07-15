@@ -3,9 +3,8 @@ const x = 'black',
   l = 'round';
 
 let canvas,
-  canvasResized,
+  container,
   ctx,
-  ctxResized,
   w = 0,
   h = 0,
   flag = false,
@@ -15,6 +14,7 @@ let canvas,
   currY = 0,
   currPath = new Path2D();
 
+container = document.getElementById('container');
 canvas = document.getElementById('can');
 ctx = canvas.getContext('2d');
 w = canvas.width;
@@ -79,8 +79,8 @@ export default {
     if (res == 'down') {
       prevX = currX;
       prevY = currY;
-      currX = e.clientX - canvas.offsetLeft;
-      currY = e.clientY - canvas.offsetTop;
+      currX = e.clientX - container.offsetLeft - canvas.offsetLeft;
+      currY = e.clientY - container.offsetTop - canvas.offsetTop;
 
       flag = true;
       ctx.beginPath();
@@ -95,8 +95,9 @@ export default {
       if (flag) {
         prevX = currX;
         prevY = currY;
-        currX = e.clientX - canvas.offsetLeft;
-        currY = e.clientY - canvas.offsetTop;
+        currX = e.clientX - container.offsetLeft - canvas.offsetLeft;
+        currY = e.clientY - container.offsetTop - canvas.offsetTop;
+
         draw();
       }
     }

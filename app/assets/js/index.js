@@ -56,6 +56,7 @@ async function init() {
     /* TOUCH DEVICES */
     canvas.addEventListener("touchmove", function (e) {
       var touch = e.touches[0];
+
       var mouseEvent = new MouseEvent("mousemove", {
         clientX: touch.clientX,
         clientY: touch.clientY
