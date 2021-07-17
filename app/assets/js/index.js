@@ -22,7 +22,7 @@ async function init() {
     await loadConfig();
 
     const canvas = canvasInstance.getCanvas();
-
+    let autoRead = false;
 
     canvas.addEventListener(
       'mousemove',
@@ -54,41 +54,64 @@ async function init() {
     );
 
     /* TOUCH DEVICES */
-    canvas.addEventListener("touchmove", function (e) {
-      var touch = e.touches[0];
+    canvas.addEventListener(
+      'touchmove',
+      function (e) {
+        var touch = e.touches[0];
 
-      var mouseEvent = new MouseEvent("mousemove", {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      });
-      canvas.dispatchEvent(mouseEvent);
-    }, false);
-    canvas.addEventListener("touchstart", function (e) {
-      var touch = e.touches[0];
-      var mouseEvent = new MouseEvent("mousedown", {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      });
-      canvas.dispatchEvent(mouseEvent);
-    }, false);
-    canvas.addEventListener("touchend", function (e) {
-      var touch = e.touches[0];
-      var mouseEvent = new MouseEvent("mouseup", {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      });
-      canvas.dispatchEvent(mouseEvent);
-    }, false);
+        var mouseEvent = new MouseEvent('mousemove', {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+        canvas.dispatchEvent(mouseEvent);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'touchstart',
+      function (e) {
+        var touch = e.touches[0];
+        var mouseEvent = new MouseEvent('mousedown', {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+        canvas.dispatchEvent(mouseEvent);
+      },
+      false
+    );
+    canvas.addEventListener(
+      'touchend',
+      function (e) {
+        var touch = e.touches[0];
+        var mouseEvent = new MouseEvent('mouseup', {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+        canvas.dispatchEvent(mouseEvent);
+      },
+      false
+    );
+    const readButton = document.getElementById('r');
+    readButton.addEventListener(
+      'click',
+      function (e) {
+        speak(taskText);
+      },
+      false
+    );
 
     document.getElementById('btn').addEventListener(
       'click',
       function (e) {
         if (e.target.innerText === 'Starten') {
-          // Removing shade and adding white background
-          canvas.classList.remove('bg-gray-200');
-          canvas.classList.add('bg-white');
+          // Removing canvas overlay and setting initial state
+          document.getElementById('canvas-overlay').remove();
+          document
+            .getElementById('canvas-wrapper')
+            .classList.remove('relative');
 
-          newTask();
+          autoRead = setState(config.kState);
+          newTask(autoRead);
           e.target.innerText = 'Fertig';
           return;
         }
@@ -103,18 +126,12 @@ async function init() {
       },
       false
     );
-    document.getElementById('r').addEventListener(
-      'click',
-      function (e) {
-        speak(taskText);
-      },
-      false
-    );
+
     document.getElementById('q').addEventListener(
       'click',
       function (e) {
         canvasInstance.erase();
-        newTask();
+        newTask(autoRead);
       },
       false
     );
@@ -134,28 +151,31 @@ async function init() {
         curNumTasks++;
 
         if (numTasks != null) {
-          if(curNumTasks < numTasks) {
+          if (curNumTasks < numTasks) {
             updateProgress();
-
-            newTask();
-          } else if(curNumTasks === numTasks) {
+            newTask(autoRead);
+          } else if (curNumTasks === numTasks) {
             showModalWithEndResult();
             updateProgress();
           } else {
-            modalPrimaryButton.classList.remove(`bg-indigo-600`, `hover:bg-indigo-500`);
+            modalPrimaryButton.classList.remove(
+              `bg-indigo-600`,
+              `hover:bg-indigo-500`
+            );
 
             modalPrimaryButton.innerText = 'Weiter';
-            document.getElementById('modalSecondaryButton').style.display = 'block';
+            document.getElementById('modalSecondaryButton').style.display =
+              'block';
 
             curNumTasks = 0;
             correctTasks = 0;
 
             updateProgress();
 
-            newTask();
+            newTask(autoRead);
           }
         } else {
-          newTask();
+          newTask(autoRead);
         }
       },
       false
@@ -167,25 +187,54 @@ async function init() {
       },
       false
     );
-
-    const taskField = document.getElementById('taskField');
-    switch (config.kState) {
-      case 'r':
-        taskField.classList.add(`hidden`);
-        break;
-      case 't':
-        break;
-      case 'rt':
-        break;
-
-      default:
-        break;
-    }
   } catch (error) {
     console.error(error);
 
     // TODO DISPLAY ERROR MESSAGE
   }
+}
+
+function setState(state) {
+  const readButton = document.getElementById('r');
+  const taskField = document.getElementById('taskField');
+  let autoRead = false;
+  switch (state) {
+    case 'r':
+      readButton.classList.remove('cursor-default');
+      readButton.classList.add(
+        'hover:bg-indigo-500',
+        'hover:text-white',
+        'speaker-button'
+      );
+      readButton.disabled = false;
+
+      taskField.classList.remove('hidden');
+      taskField.innerHTML = 'Vorlesen';
+      autoRead = true;
+      break;
+    case 't':
+      // todo: disable read button and hide speaker icon
+      document.getElementById('speaker-icon').remove();
+
+      taskField.classList.remove('hidden');
+      autoRead = false;
+      break;
+    case 'rt':
+      readButton.classList.remove('cursor-default');
+      readButton.classList.add(
+        'hover:bg-indigo-500',
+        'hover:text-white',
+        'speaker-button'
+      );
+      readButton.disabled = false;
+      taskField.classList.remove('hidden');
+      autoRead = true;
+      break;
+
+    default:
+      break;
+  }
+  return autoRead;
 }
 
 function localizeAndMapCharacter(char) {
@@ -235,10 +284,7 @@ function showModalWithEndResult() {
   const secondaryBtn = document.getElementById('modalSecondaryButton');
 
   // Setup modal content
-  primaryBtn.classList.add(
-    `bg-indigo-600`,
-    `hover:bg-indigo-500`
-  );
+  primaryBtn.classList.add(`bg-indigo-600`, `hover:bg-indigo-500`);
 
   primaryBtn.innerText = 'Neuer Versuch';
   secondaryBtn.style.display = 'none';
@@ -257,10 +303,14 @@ function onSubmit() {
   predict();
 }
 
-function newTask() {
+function newTask(autoRead) {
   currentTaskCharacter = getNewChar();
   taskText = `Zeichnen Sie ${localizeAndMapCharacter(currentTaskCharacter)}`;
-  document.getElementById('taskField').innerHTML = taskText;
+  if (autoRead) {
+    speak(taskText);
+  }
+  if (config.kState !== 'r')
+    document.getElementById('taskField').innerHTML = taskText;
 }
 
 function speak(text) {
@@ -284,14 +334,14 @@ function predict() {
       console.log(`predictedResult`, predictedResult);
       showModalWithResult(isResultCorrect, predictedResult, predictedScore);
 
-      if(isResultCorrect) correctTasks++;
+      if (isResultCorrect) correctTasks++;
     }
   );
 }
 
 function updateProgress() {
-  progressBar.style.width = `${(curNumTasks / numTasks) * 100}%`
-  progressText.innerHTML = `${curNumTasks}/${numTasks}`
+  progressBar.style.width = `${(curNumTasks / numTasks) * 100}%`;
+  progressText.innerHTML = `${curNumTasks}/${numTasks}`;
 }
 
 async function loadConfig() {
@@ -330,8 +380,8 @@ async function loadConfig() {
     curNumTasks = 0;
     correctTasks = 0;
 
-    progressText = document.getElementById("progress-text");
-    progressBar = document.getElementById("progress-bar");
+    progressText = document.getElementById('progress-text');
+    progressBar = document.getElementById('progress-bar');
 
     updateProgress();
 
