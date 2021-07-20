@@ -1,0 +1,23 @@
+#table-container {
+  max-width: 300px;
+  border: 1px solid rgb(209, 213, 219);
+  border-radius: .375rem;
+}
+
+#table-container table.data {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+#table-container table.data th {
+  background-color: rgb(209, 213, 219);
+}
+
+#table-container table.data td {
+  text-align: center;
+}
+
+#table-container table.data td:not(:last-of-type) {
+  border-right: 1px solid rgb(209, 213, 219);
+}

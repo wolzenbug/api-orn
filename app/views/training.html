@@ -8,21 +8,23 @@
 <head>
   <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
     rel="stylesheet" />
+  <link href="static/css/style-training.css" rel="stylesheet" />
   <script type="module" src="static/js/training.js"></script>
 </head>
 
 <body class="h-full">
   <div class="flex justify-center items-center h-full">
-    <div id="container" class="relative bg-gray-50 inline-block p-2 rounded-sm shadow-sm">
+    <div id="container"
+      class="relative bg-gray-50 inline-block p-2 rounded-sm shadow-sm">
       <div class="
         mb-2
         rounded-md
         bg-indigo-600
       ">
         <label class="text-white w-full h-full block p-2 cursor-pointer"
-          for="csv" id="select-label">Datei
+          for="csv" id="select-label">CSV-Datei
           hochladen...</label>
-        <input class="hidden" id="csv" type="file" />
+        <input class="hidden" id="csv" type="file" accept=".csv" />
       </div>
 
       <div id="canvas-container" class="
@@ -44,8 +46,15 @@
           <select name="current-char" class="font-medium"
             id="current-char"></select>
         </div>
-        <canvas id="can" width="280" height="280"
+        <div class='relative m-2 rounded-md' id='canvas-wrapper'>
+          <div id='canvas-overlay'
+            class='bg-gray-200 absolute inset-0 flex justify-center items-center rounded'>
+            Bitte Datei mit Labeln hochladen...
+          </div>
+          <canvas id="can" width="280" height="280"
           class="bg-white rounded-md border mx-2"></canvas>
+        </div>
+  
         <div class="flex justify-between px-2 pb-2">
           <div class="h-8 space-x-2">
             <button type="button" id="clr" class="
@@ -108,37 +117,9 @@
       <div id="current-count-container" style="display: none;">
         <p class="font-medium py-2">Anzahl bisherige Daten:</p>
         <div id="table-container">
-          <table id="data">
-          </table>
         </div>
       </div>
     </div>
 </body>
 
 </html>
-
-<style>
-  #table-container {
-    max-width: 300px;
-    border: 1px solid rgb(209, 213, 219);
-    border-radius: .375rem;
-  }
-
-  #table-container table#data {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-  }
-
-  #table-container table#data th {
-    background-color: rgb(209, 213, 219);
-  }
-
-  #table-container table#data td {
-    text-align: center;
-  }
-
-  #table-container table#data td:not(:last-of-type) {
-    border-right: 1px solid rgb(209, 213, 219);
-  }
-</style>

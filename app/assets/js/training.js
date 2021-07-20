@@ -4,7 +4,7 @@ let input,
   select,
   selectLabel,
   currentCountContainer,
-  table,
+  tableContainer,
   data = {},
   chars = [];
 
@@ -13,27 +13,54 @@ function init() {
   currentCountContainer = document.getElementById("current-count-container");
   selectLabel = document.getElementById("select-label");
   select = document.getElementById("current-char");
-  table = document.getElementById("data");
+  tableContainer = document.getElementById("table-container");
+
+  const clr = document.getElementById('clr');
+  const btn = document.getElementById('btn');
+  const s = document.getElementById('s');
+
+  select.setAttribute('disabled', true);
+  select.setAttribute('disabled', true);
+  btn.setAttribute('disabled', true);
+  clr.setAttribute('disabled', true);
+  s.setAttribute('disabled', true);
 
   const reader = new FileReader();
   reader.onload = () => {
-    chars = reader.result.split(',');
+    document.getElementById('canvas-overlay').remove();
+    document
+      .getElementById('canvas-wrapper')
+      .classList.remove('relative');
 
-    console.log(chars);
+    const rows = reader.result.split('\n');
 
-    initDataObject(chars);
+    chars = [];
+    chars = rows[0].split(',');
+
+    const existingData = rows.length > 1 ? rows.slice(1).filter(r => r.length > 0) : [];
+
+    initDataObject(chars, existingData);
     populateSelect(chars);
 
-    populateTableWithData();
+    populateTables();
   }
 
   input.addEventListener(
     'change',
     function (e) {
-      currentCountContainer.style.display = 'block';
-      selectLabel.innerHTML = input.files[0].name;
+      const file = input.files[0];
 
-      reader.readAsBinaryString(input.files[0]);
+      if (file.name.split('.')[1] === 'csv') {
+        currentCountContainer.style.display = 'block';
+        selectLabel.innerHTML = input.files[0].name;
+
+        select.removeAttribute('disabled');
+        btn.removeAttribute('disabled');
+        clr.removeAttribute('disabled');
+        s.removeAttribute('disabled');
+
+        reader.readAsBinaryString(input.files[0]);
+      }
     });
 
   const canvas = canvasInstance.getCanvas();
@@ -94,26 +121,26 @@ function init() {
     canvas.dispatchEvent(mouseEvent);
   }, false);
 
-  document.getElementById('clr').addEventListener(
+  clr.addEventListener(
     'click',
     function (e) {
       canvasInstance.erase();
     },
     false
   );
-  document.getElementById('btn').addEventListener(
+  btn.addEventListener(
     'click',
     function (e) {
       data[select.value].push(canvasInstance.getScaledData(0.1))
       canvasInstance.erase();
 
-      populateTableWithData();
+      populateTables();
 
       console.log(data);
     },
     false
   );
-  document.getElementById('s').addEventListener(
+  s.addEventListener(
     'click',
     function (e) {
       exportDataAsCSV();
@@ -129,17 +156,17 @@ function exportDataAsCSV() {
 
   let numberRows = 0;
   for (const key in data) {
-    if(numberRows < data[key].length) numberRows = data[key].length;
+    if (numberRows < data[key].length) numberRows = data[key].length;
   }
 
   for (let i = 0; i < numberRows; i++) {
     for (const key in data) {
       const values = data[key];
 
-      if(i < values.length) {
+      if (i < values.length) {
         content += `${values[i].join(';')}`
-      } 
-      
+      }
+
       if (key != chars[chars.length - 1]) {
         content += ',';
       }
@@ -160,6 +187,8 @@ function exportDataAsCSV() {
 }
 
 function populateSelect(options) {
+  select.innerHTML = '';
+
   for (const o of options) {
     let option = document.createElement('option')
     option.value = o;
@@ -169,13 +198,35 @@ function populateSelect(options) {
   }
 }
 
-function populateTableWithData() {
+function populateTables() {
+  const chunks = [];
+  const chunkSize = 10;
+
+  for (let i = 0; i < chars.length; i += chunkSize) {
+    chunks.push(chars.slice(i, i + chunkSize));
+  }
+
+  tableContainer.innerHTML = '';
+  for (let chunk of chunks) {
+    const table = document.createElement('table');
+    table.className = 'data';
+
+    tableContainer.appendChild(table);
+
+    populateTableWithChunk(chunk, table);
+  }
+}
+
+function populateTableWithChunk(chunk, table) {
   table.innerHTML = '';
 
   const tableHeaderRow = document.createElement('tr'),
     tableCountRow = document.createElement('tr');
 
-  for (const c in data) {
+  for (const c of chunk) {
+    console.log("C", c);
+    console.log("DATA AT C", data[c]);
+
     const headerColumn = document.createElement('th');
     headerColumn.innerHTML = c;
 
@@ -190,9 +241,19 @@ function populateTableWithData() {
   table.appendChild(tableCountRow);
 }
 
-function initDataObject(keys) {
+function initDataObject(keys, rows) {
+  data = {};
+
   for (const k of keys) {
     data[k] = [];
+  }
+
+  for (const row of rows) {
+    const r = row.split(',');
+
+    for (const index in r) {
+      if (r[index].length > 0) data[keys[index]].push(r[index].split(';'));
+    }
   }
 }
 
