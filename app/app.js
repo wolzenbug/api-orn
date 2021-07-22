@@ -25,5 +25,5 @@ app.get('/training', (req, res) => {
 
 app.listen(process.env.PORT || port, () => {
   console.log(`API-ORN dev server listening at http://localhost:${port}`);
-  console.log(`Example http://localhost:${port}/?lang=latin&t=tf`);
+  console.log(`Example http://localhost:${port}/?lang=latin&t=tf&m=r`);
 });
