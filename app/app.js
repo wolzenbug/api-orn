@@ -10,11 +10,12 @@ app.set('view engine', 'handlebars');
 
 app.use('/static', express.static(__dirname + '/assets'));
 
-// EXAMPLE: http://localhost:3000/?lang=latin&t=tf
+// EXAMPLE: http://localhost:3000/?lang=latin&t=tf&s=r,t
 app.get('/', (req, res) => {
   res.locals.lang = req.query.lang; // language
-  res.locals.t = req.query.t;       // technology (tensorflow/tesseract)
-  res.locals.r = req.query.r;       // number of rounds (opt)
+  res.locals.t = req.query.t; // technology (tensorflow/tesseract)
+  res.locals.r = req.query.r; // number of rounds (opt)
+  res.locals.m = req.query.m; // read and or text mode (opt) (options listed in config.js)
   res.render('quiz');
 });
 

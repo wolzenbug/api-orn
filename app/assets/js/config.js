@@ -133,8 +133,5 @@ export default {
       'ω',
     ],
   },
-  kState: 'r',
-  // 'r', // only read
-  // 't', // only text
-  // 'rt', // read and text
+  modes: { READ: 'r', TEXT: 't' },
 };
