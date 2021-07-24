@@ -1,7 +1,6 @@
 import canvasInstance from './canvas.js';
-import { isString } from './helpers.js';
 import localeLangMaps from './languagemaps.js';
-import config from './config.js';
+import config from './config/config.js';
 
 const locale = 'de-DE';
 const TESSERACT = 'tsr';
@@ -388,6 +387,10 @@ async function loadConfig() {
     document.getElementById('q').style.display = 'none';
     document.getElementById('progress-container').classList.remove('hidden');
   }
+}
+
+export function isString (obj) {
+  return (Object.prototype.toString.call(obj) === '[object String]');
 }
 
 init();

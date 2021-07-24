@@ -1,6 +1,6 @@
 
 import canvasInstance from "../canvas.js";
-import config from "../config.js";
+import config from "../config/config.js";
 
 // source: https://www.kaggle.com/crawford/emnist?select=emnist-byclass-mapping.txt
 // Outsource for different models
