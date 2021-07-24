@@ -112,9 +112,12 @@ export default {
   getTech() {
     return canvas.getAttribute('t');
   },
+  getModes() {
+    return canvas.getAttribute('m')?.split(',');
+  },
   getNumberRounds() {
     const num = parseInt(canvas.getAttribute('r'));
 
     return isNaN(num) ? null : num;
-  }
+  },
 };

@@ -108,9 +108,8 @@ async function init() {
           document
             .getElementById('canvas-wrapper')
             .classList.remove('relative');
-
-          autoRead = setState(config.kState);
-          newTask(autoRead);
+          setUIStateBasedOnModes(canvasInstance.getModes());
+          newTask();
           e.target.innerText = 'Fertig';
           return;
         }
@@ -130,7 +129,7 @@ async function init() {
       'click',
       function (e) {
         canvasInstance.erase();
-        newTask(autoRead);
+        newTask();
       },
       false
     );
@@ -152,7 +151,7 @@ async function init() {
         if (numTasks != null) {
           if (curNumTasks < numTasks) {
             updateProgress();
-            newTask(autoRead);
+            newTask();
           } else if (curNumTasks === numTasks) {
             showModalWithEndResult();
             updateProgress();
@@ -170,11 +169,10 @@ async function init() {
             correctTasks = 0;
 
             updateProgress();
-
-            newTask(autoRead);
+            newTask();
           }
         } else {
-          newTask(autoRead);
+          newTask();
         }
       },
       false
@@ -193,47 +191,33 @@ async function init() {
   }
 }
 
-function setState(state) {
+function hasDesiredMode(modes, desiredMode) {
+  return modes.find((m) => m === desiredMode) !== undefined;
+}
+
+function setUIStateBasedOnModes(modes) {
   const readButton = document.getElementById('r');
   const taskField = document.getElementById('taskField');
-  let autoRead = false;
-  switch (state) {
-    case 'r':
-      readButton.classList.remove('cursor-default');
-      readButton.classList.add(
-        'hover:bg-indigo-500',
-        'hover:text-white',
-        'speaker-button'
-      );
-      readButton.disabled = false;
+  console.log(`modes`, modes);
+  const textMode = hasDesiredMode(modes, config.modes.TEXT);
+  const readMode = hasDesiredMode(modes, config.modes.READ);
 
-      taskField.classList.remove('hidden');
-      taskField.innerHTML = 'Vorlesen';
-      autoRead = true;
-      break;
-    case 't':
-      // todo: disable read button and hide speaker icon
-      document.getElementById('speaker-icon').remove();
-
-      taskField.classList.remove('hidden');
-      autoRead = false;
-      break;
-    case 'rt':
-      readButton.classList.remove('cursor-default');
-      readButton.classList.add(
-        'hover:bg-indigo-500',
-        'hover:text-white',
-        'speaker-button'
-      );
-      readButton.disabled = false;
-      taskField.classList.remove('hidden');
-      autoRead = true;
-      break;
-
-    default:
-      break;
+  // if no mode specified -> fall back to text mode
+  if (textMode || (!readMode && !textMode)) {
+    document.getElementById('speaker-icon').remove();
+    taskField.classList.remove('hidden');
   }
-  return autoRead;
+  if (readMode) {
+    readButton.classList.remove('cursor-default');
+    readButton.classList.add(
+      'hover:bg-indigo-500',
+      'hover:text-white',
+      'speaker-button'
+    );
+    readButton.disabled = false;
+    taskField.classList.remove('hidden');
+    taskField.innerHTML = 'Vorlesen';
+  }
 }
 
 function localizeAndMapCharacter(char) {
@@ -302,14 +286,18 @@ function onSubmit() {
   predict();
 }
 
-function newTask(autoRead) {
+function newTask() {
   currentTaskCharacter = getNewChar();
   taskText = `Zeichnen Sie ${localizeAndMapCharacter(currentTaskCharacter)}`;
-  if (autoRead) {
+
+  const modes = canvasInstance.getModes();
+  const isRead = hasDesiredMode(modes, config.modes.READ);
+
+  if (isRead) {
     speak(taskText);
-  }
-  if (config.kState !== 'r')
+  } else {
     document.getElementById('taskField').innerHTML = taskText;
+  }
 }
 
 function speak(text) {
