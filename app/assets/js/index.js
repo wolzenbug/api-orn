@@ -102,7 +102,8 @@ async function init() {
     document.getElementById('btn').addEventListener(
       'click',
       function (e) {
-        if (e.target.innerText === 'Starten') {
+        const buttonText = document.getElementById('btn-txt');
+        if (buttonText.innerText === 'Starten') {
           // Removing canvas overlay and setting initial state
           document.getElementById('canvas-overlay').remove();
           document
@@ -110,7 +111,8 @@ async function init() {
             .classList.remove('relative');
           setUIStateBasedOnModes(canvasInstance.getModes());
           newTask();
-          e.target.innerText = 'Fertig';
+
+          buttonText.innerText = 'Fertig';
           return;
         }
         onSubmit();
@@ -229,6 +231,22 @@ function toggleModalVisibility() {
   document.getElementById('dialog').classList.toggle('hidden');
 }
 
+function setLoadingIndicatorVisible(isVisibile) {
+  const button = document.getElementById('btn');
+  const spinner = document.getElementById('spinner');
+  button.disabled = isVisibile;
+
+  if (isVisibile) {
+    button.classList.remove('hover:bg-green-500');
+    button.classList.add('cursor-not-allowed', 'bg-opacity-60');
+    spinner.classList.remove('hidden');
+  } else {
+    button.classList.add('hover:bg-green-500');
+    button.classList.remove('cursor-not-allowed', 'bg-opacity-60');
+    spinner.classList.add('hidden');
+  }
+}
+
 function showModalWithResult(success, prediction, predictionAccuracy) {
   const modalTitle = document.getElementById('modal-title');
   const pred = document.getElementById('prediction');
@@ -250,6 +268,7 @@ function showModalWithResult(success, prediction, predictionAccuracy) {
       ? ` (${(predictionAccuracy * 100).toFixed(2)}%)`
       : '';
   }
+
   modalTitle.innerText = modalTitleText;
 
   // Show modal
@@ -309,13 +328,15 @@ function speak(text) {
   speechSynthesis.speak(msg);
 }
 
-function predict() {
-  getPrediction(
+async function predict() {
+  setLoadingIndicatorVisible(true);
+  await getPrediction(
     canvasInstance.getCanvas(),
     ({ predictedScore, predictedResult }) => {
       const isResultCorrect = predictedResult === currentTaskCharacter;
-
+      console.log('git it');
       showModalWithResult(isResultCorrect, predictedResult, predictedScore);
+      setLoadingIndicatorVisible(false);
 
       if (isResultCorrect) correctTasks++;
     }
@@ -369,8 +390,8 @@ async function loadConfig() {
   }
 }
 
-export function isString (obj) {
-  return (Object.prototype.toString.call(obj) === '[object String]');
+export function isString(obj) {
+  return Object.prototype.toString.call(obj) === '[object String]';
 }
 
 init();
