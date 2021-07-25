@@ -14,6 +14,8 @@ function init() {
   selectLabel = document.getElementById("select-label");
   select = document.getElementById("current-char");
   tableContainer = document.getElementById("table-container");
+  
+  const canvasOverlay = document.getElementById('canvas-overlay');
 
   const clr = document.getElementById('clr');
   const btn = document.getElementById('btn');
@@ -27,7 +29,7 @@ function init() {
 
   const reader = new FileReader();
   reader.onload = () => {
-    document.getElementById('canvas-overlay').remove();
+    if(canvasOverlay) canvasOverlay.remove();
     document
       .getElementById('canvas-wrapper')
       .classList.remove('relative');
@@ -131,12 +133,10 @@ function init() {
   btn.addEventListener(
     'click',
     function (e) {
-      data[select.value].push(canvasInstance.getScaledData(0.1))
+      data[select.value].push(canvasInstance.getScaledData())
       canvasInstance.erase();
 
       populateTables();
-
-      console.log(data);
     },
     false
   );
@@ -174,8 +174,6 @@ function exportDataAsCSV() {
 
     content += '\n'
   }
-
-  // console.log(content);
 
   const encodedUri = encodeURI(content);
   const link = document.createElement("a");
@@ -224,9 +222,6 @@ function populateTableWithChunk(chunk, table) {
     tableCountRow = document.createElement('tr');
 
   for (const c of chunk) {
-    console.log("C", c);
-    console.log("DATA AT C", data[c]);
-
     const headerColumn = document.createElement('th');
     headerColumn.innerHTML = c;
 
@@ -252,9 +247,11 @@ function initDataObject(keys, rows) {
     const r = row.split(',');
 
     for (const index in r) {
-      if (r[index].length > 0) data[keys[index]].push(r[index].split(';'));
+      if (r[index].length > 0 && !(r[index] === "\n" || r[index] === "\r")) data[keys[index]].push(r[index].split(';'));
     }
   }
+
+  console.log("DATA", data);
 }
 
 init();

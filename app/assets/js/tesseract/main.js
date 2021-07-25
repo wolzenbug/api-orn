@@ -10,8 +10,8 @@ export async function predictModel(canvas, callback) {
   const allowedChars = map.join('');
 
   await worker.load();
-  await worker.loadLanguage(config.model.tsr[language]);
-  await worker.initialize(config.model.tsr[language]);
+  await worker.loadLanguage(config.model.tsr[language].code);
+  await worker.initialize(config.model.tsr[language].code);
   await worker.setParameters({
     tessedit_pageseg_mode: 10, // PSM_SINGLE_CHAR
     tessedit_char_whitelist: allowedChars
@@ -19,7 +19,6 @@ export async function predictModel(canvas, callback) {
   const {
     data: { text },
   } = await worker.recognize(canvas);
-  console.log(text);
   await worker.terminate();
 
   const predictedResult = text.trim();
@@ -31,7 +30,7 @@ export async function predictModel(canvas, callback) {
 export function loadModel(l) {
   language = l;
 
-  map = config.langMaps[language];
+  map = config.model.tsr[language].labels;
 }
 
 export function getRandomChar() {

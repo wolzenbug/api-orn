@@ -17,12 +17,10 @@ function employWorker(data, callback) {
     }
 
     worker.onmessage = function (e) {
-      console.log('Message received from worker', e);
       callback(e.data);
     }
 
-    worker.postMessage({ data, map, path: config.model.tf[canvasInstance.getLanguage()] });
-    console.log('Message posted to worker', data);
+    worker.postMessage({ data, map, path: config.model.tf[canvasInstance.getLanguage()].path });
   }
 }
 
@@ -30,7 +28,7 @@ export async function loadModel(l) {
 
   language = l;
 
-  map = config.langMaps[language]
+  map = config.model.tf[canvasInstance.getLanguage()].labels;
   
   let initPredict = [];
 
@@ -44,7 +42,7 @@ export async function loadModel(l) {
 }
 
 export function predictModel(canvas, callback) {
-  const imgData = canvasInstance.getScaledData(0.1);
+  const imgData = canvasInstance.getScaledData(config.model.tf[language].fitInput);
 
   employWorker(imgData, callback);
 }

@@ -9,7 +9,6 @@ onmessage = function (e) {
 
   predict(data, map, path)
     .then((res) => {
-      console.log('Posting message back to main script');
       postMessage(res);
     })
     .catch((err) => {
@@ -34,8 +33,6 @@ async function predict(data, map, path) {
 
     prediction.data()
       .then((flattenedPrediction) => {
-        console.log(flattenedPrediction);
-
         const i = flattenedPrediction.indexOf(Math.max(...flattenedPrediction));
         const predictedScore = flattenedPrediction[i];
         const predictedResult = map[i];

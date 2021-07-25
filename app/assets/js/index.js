@@ -1,5 +1,5 @@
 import canvasInstance from './canvas.js';
-import localeLangMaps from './languagemaps.js';
+import localeLangMaps from './config/languagemaps.js';
 import config from './config/config.js';
 
 const locale = 'de-DE';
@@ -186,8 +186,6 @@ async function init() {
     );
   } catch (error) {
     console.error(error);
-
-    // TODO DISPLAY ERROR MESSAGE
   }
 }
 
@@ -198,7 +196,6 @@ function hasDesiredMode(modes, desiredMode) {
 function setUIStateBasedOnModes(modes) {
   const readButton = document.getElementById('r');
   const taskField = document.getElementById('taskField');
-  console.log(`modes`, modes);
   const textMode = hasDesiredMode(modes, config.modes.TEXT);
   const readMode = hasDesiredMode(modes, config.modes.READ);
 
@@ -269,6 +266,7 @@ function showModalWithEndResult() {
   // Setup modal content
   primaryBtn.classList.add(`bg-indigo-600`, `hover:bg-indigo-500`);
 
+  primaryBtn.blur();
   primaryBtn.innerText = 'Neuer Versuch';
   secondaryBtn.style.display = 'none';
 
@@ -315,10 +313,8 @@ function predict() {
   getPrediction(
     canvasInstance.getCanvas(),
     ({ predictedScore, predictedResult }) => {
-      console.log(`currentTaskCharacter`, currentTaskCharacter);
       const isResultCorrect = predictedResult === currentTaskCharacter;
 
-      console.log(`predictedResult`, predictedResult);
       showModalWithResult(isResultCorrect, predictedResult, predictedScore);
 
       if (isResultCorrect) correctTasks++;
@@ -339,8 +335,6 @@ async function loadConfig() {
   if (isString(lang) && isString(t)) {
     {
       if (t == TESSERACT) {
-        console.log('LOAD TESSERACT');
-
         const { loadModel, predictModel, getRandomChar } = await import(
           './tesseract/main.js'
         );
@@ -349,8 +343,6 @@ async function loadConfig() {
 
         loadModel(lang);
       } else if (t == TENSORFLOW) {
-        console.log('LOAD TENSORFLOW');
-
         const { loadModel, predictModel, getRandomChar } = await import(
           './tensorflow/main.js'
         );
