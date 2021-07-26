@@ -201,12 +201,14 @@ function setUIStateBasedOnModes(modes) {
   const textMode = hasDesiredMode(modes, config.modes.TEXT);
   const readMode = hasDesiredMode(modes, config.modes.READ);
 
+  taskField.classList.remove('hidden');
+
   // if no mode specified -> fall back to text mode
-  if (textMode || (!readMode && !textMode)) {
+  if ((textMode && !readMode) || (!readMode && !textMode)) {
     document.getElementById('speaker-icon').remove();
-    taskField.classList.remove('hidden');
   }
   if (readMode) {
+    document.getElementById('speaker-icon').classList.remove('hidden');
     readButton.classList.remove('cursor-default');
     readButton.classList.add(
       'hover:bg-indigo-500',
@@ -214,8 +216,8 @@ function setUIStateBasedOnModes(modes) {
       'speaker-button'
     );
     readButton.disabled = false;
-    taskField.classList.remove('hidden');
-    taskField.innerHTML = 'Vorlesen';
+
+    if (!textMode) taskField.innerHTML = 'Vorlesen';
   }
 }
 
@@ -308,13 +310,11 @@ function newTask() {
   taskText = `Zeichnen Sie ${localizeAndMapCharacter(currentTaskCharacter)}`;
 
   const modes = canvasInstance.getModes();
-  const isRead = hasDesiredMode(modes, config.modes.READ);
+  const isReadMode = hasDesiredMode(modes, config.modes.READ);
+  const isTextMode = hasDesiredMode(modes, config.modes.TEXT);
 
-  if (isRead) {
-    speak(taskText);
-  } else {
-    document.getElementById('taskField').innerHTML = taskText;
-  }
+  if (isReadMode) speak(taskText);
+  if (isTextMode) document.getElementById('taskField').innerHTML = taskText;
 }
 
 function speak(text) {

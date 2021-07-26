@@ -1,11 +1,9 @@
-import config from "../config/config.js";
+import config from '../config/config.js';
 
 let worker, map, language;
 
 export async function predictModel(canvas, callback) {
-  worker = Tesseract.createWorker({
-    logger: (m) => console.log(m),
-  });
+  worker = Tesseract.createWorker();
 
   const allowedChars = map.join('');
 
@@ -14,7 +12,7 @@ export async function predictModel(canvas, callback) {
   await worker.initialize(config.model.tsr[language].code);
   await worker.setParameters({
     tessedit_pageseg_mode: 10, // PSM_SINGLE_CHAR
-    tessedit_char_whitelist: allowedChars
+    tessedit_char_whitelist: allowedChars,
   });
   const {
     data: { text },
@@ -34,5 +32,5 @@ export function loadModel(l) {
 }
 
 export function getRandomChar() {
-  return map[Math.floor((Math.random() * map.length))];
+  return map[Math.floor(Math.random() * map.length)];
 }
