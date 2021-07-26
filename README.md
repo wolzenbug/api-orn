@@ -6,31 +6,19 @@ _Currently available languages: German_
 
 ## Query parameter
 
-#### `lang`: Selects an alphabet to pick
-
-Options:
-
+#### `lang`: Selects an alphabet to pick:
 - `latin` (available in: `tf, tsr`)
 - `greek` (available in: `tf, tsr`)
 - `arithmetic` (available in: `tf`)
 
-#### `t`: Selects a recognition technology
-
-Options:
-
+#### `t`: Selects a recognition technology:
 - `tsr`: Tesseract OCR
 - `tf`: [TensorFlow CNN model based EMNIST data sets](https://colab.research.google.com/drive/1CJMWZMhKRwx_2-a7GfLPSMmUPRjifQSO?usp=sharing)
 
-#### `r`: Limits the number of characters quizzed (optional)
-
-Options:
-
+#### `r`: Limits the number of characters quizzed (optional):
 - `positive number`: Any number you wish for
 
-#### `m`: Selects the mode of the quiz (optional)
-
-Options:
-
+#### `m`: Selects the mode of the quiz (optional):
 - `r`: **read** Audio instructions only (instruction text is hidden)
 - `t`: **text** Text instructions only (speaker button is disabled) (_default mode_)
 - `r,t`: Text and audio instruction (instruction text & voice)
