@@ -23,7 +23,7 @@ _Currently available languages: German_
 - `t`: **text** Text instructions only (speaker button is disabled) (_default mode_)
 - `r,t`: Text and audio instruction (instruction text & voice)
 
-#### Example query:`?lang=latin&t=tf&m=r`
+#### Example query:`?lang=latin&t=tf&r=12&m=r`
 
 ## Development
 
