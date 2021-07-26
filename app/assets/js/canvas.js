@@ -50,7 +50,8 @@ function getScaledCanvasFittedData() {
   const bW = boundingMaxX - boundingMinX;
   const bH = boundingMaxY - boundingMinY;
 
-  let pathScaleFactor = bW > bH ? SAMPLE_IMG_WIDTH / bW : SAMPLE_IMG_HEIGHT / bH;
+  let pathScaleFactor =
+    bW > bH ? SAMPLE_IMG_WIDTH / bW : SAMPLE_IMG_HEIGHT / bH;
 
   let t = m.scale(pathScaleFactor);
 
@@ -68,16 +69,23 @@ function getScaledCanvasFittedData() {
 
   const imgData = copyContext.getImageData(0, 0, w, h);
 
-  const fX = bW > bH ? 0 : (SAMPLE_IMG_WIDTH - (bW * pathScaleFactor)) / 2;
-  const fY = bW > bH ? (SAMPLE_IMG_HEIGHT - (bH * pathScaleFactor)) / 2 : 0;
+  const fX = bW > bH ? 0 : (SAMPLE_IMG_WIDTH - bW * pathScaleFactor) / 2;
+  const fY = bW > bH ? (SAMPLE_IMG_HEIGHT - bH * pathScaleFactor) / 2 : 0;
   const shiftX = -boundingMinX * pathScaleFactor + fX;
   const shiftY = -boundingMinY * pathScaleFactor + fY;
 
   copyTranslatedContext.putImageData(imgData, shiftX, shiftY);
 
-  const imgDataTranslated = copyTranslatedContext.getImageData(0, 0, SAMPLE_IMG_WIDTH, SAMPLE_IMG_HEIGHT);
-  
-  const alphaFilteredData = imgDataTranslated.data.filter((d, i) => (i + 1) % 4 === 0);
+  const imgDataTranslated = copyTranslatedContext.getImageData(
+    0,
+    0,
+    SAMPLE_IMG_WIDTH,
+    SAMPLE_IMG_HEIGHT
+  );
+
+  const alphaFilteredData = imgDataTranslated.data.filter(
+    (d, i) => (i + 1) % 4 === 0
+  );
   const values = normalize(Uint8Array.from(alphaFilteredData));
 
   return values;
@@ -130,7 +138,6 @@ function draw() {
   ctx.lineWidth = y;
   ctx.lineCap = l;
   ctx.stroke(currPath);
-
 
   let minX = currX - y;
   let minY = currY - y;
@@ -196,7 +203,7 @@ export default {
     return canvas.getAttribute('t');
   },
   getModes() {
-    return canvas.getAttribute('m')?.split(',');
+    return canvas.getAttribute('m') ? canvas.getAttribute('m').split(',') : [];
   },
   getNumberRounds() {
     const num = parseInt(canvas.getAttribute('r'));
