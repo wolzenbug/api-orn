@@ -313,8 +313,9 @@ function newTask() {
   const isReadMode = hasDesiredMode(modes, config.modes.READ);
   const isTextMode = hasDesiredMode(modes, config.modes.TEXT);
 
+  if (isTextMode || (!isReadMode && !isTextMode))
+    document.getElementById('taskField').innerHTML = taskText;
   if (isReadMode) speak(taskText);
-  if (isTextMode) document.getElementById('taskField').innerHTML = taskText;
 }
 
 function speak(text) {
