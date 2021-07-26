@@ -2,9 +2,184 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>ORN API Examples</title>
+    <meta name="author" content="wolzenbug" />
+    <meta name="description" content="github examples for api-orn" />
+    <meta name="keywords" content="api,or,machine-learning,project,letters,characters,recognition,application" />
+    <link
+      href="https://unpkg.com/tailwindcss/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
   </head>
-  <body></body>
+  
+  <body class="bg-gray-200 font-sans leading-normal tracking-normal bg-blue-200">
+    <!--Header-->
+      <div
+        class="
+          container
+          max-w-4xl
+          mt-20
+          mx-auto
+          text-center
+          break-normal
+        "
+      >
+        <!--Title-->
+        <p class="text-white font-extrabold text-3xl md:text-5xl mb-1">
+            ORN API Examples
+        </p>
+        <a class="flex items-center justify-center" href="https://github.com/wolzenbug/api-orn"><span  class="mr-2">View on GitHub </span><svg version="1.1" width="16" height="16" viewBox="0 0 16 16" class="octicon octicon-mark-github" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+    </div>
+
+
+    <!--Container-->
+    <div class="container px-4 md:px-0 max-w-6xl mx-auto mb-20">
+      <div class="mx-0 sm:mx-6">
+          <!--Posts Container-->
+          <div class="flex flex-wrap justify-between pt-12 -mx-6">
+            <!--1/2 col -->
+            <div
+              class="w-full md:w-1/2 p-6 flex flex-col flex-grow flex-shrink"
+              style="height:40rem;"
+            >
+              <div
+                class="
+                  flex-1
+                  bg-white
+                  rounded-t rounded-b-none
+                  overflow-hidden
+                  shadow-lg
+                "
+              >
+              <p class="text-gray-700 px-6 pt-6">Latin alphabet, reading and text mode in TensorFlow</p>
+              <iframe src="https://api-orn.herokuapp.com/"  class="flex flex-wrap no-underline hover:no-underline h-full w-full rounded-t pb-6"></iframe>
+              </div>
+              <div
+                class="
+                  flex-none
+                  mt-auto
+                  bg-white
+                  rounded-b rounded-t-none
+                  overflow-hidden
+                  shadow-lg
+                  p-6
+                "
+              >
+                <div class="flex items-center justify-end">
+                  <p class="text-sm font-mono text-blue-600">/?lang=latin&t=tf&m=r,t</p>
+              </div>
+              </div>
+            </div>
+
+            <!--1/2 col -->
+            <div
+              class="w-full md:w-1/2 p-6 flex flex-col flex-grow flex-shrink"
+              style="height:40rem;"
+            >
+              <div
+                class="
+                  flex-1 flex-row
+                  bg-white
+                  rounded-t rounded-b-none
+                  overflow-hidden
+                  shadow-lg
+                  "
+                  >
+            <p class="text-gray-700 px-6 pt-6">Greek alphabet, reading mode in Tesseract</p>
+              <iframe src="https://api-orn.herokuapp.com/?lang=greek&t=tsr&m=r"  class="flex flex-wrap no-underline hover:no-underline h-full w-full rounded-t pb-6"></iframe>
+              </div>
+              <div
+                class="
+                  flex-none
+                  mt-auto
+                  bg-white
+                  rounded-b rounded-t-none
+                  overflow-hidden
+                  shadow-lg
+                  p-6
+                "
+              >
+              <div class="flex items-center justify-end">
+                <p class="text-sm font-mono text-blue-600">/?lang=greek&t=tsr&m=r</p>
+            </div>
+              </div>
+            </div>
+
+            <!--1/2 col -->
+            <div
+            class="w-full md:w-1/2 p-6 flex flex-col flex-grow flex-shrink"
+            style="height:40rem;"
+            >
+                     
+                <div
+                    class="
+                    flex-1
+                    bg-white
+                    rounded-t rounded-b-none
+                    overflow-hidden
+                    shadow-lg
+                    "
+                >
+                <p class="text-gray-700 px-6 pt-6">Arithmetic alphabet, 10 rounds in TensorFlow</p>
+                <iframe src="https://api-orn.herokuapp.com/?lang=arithmetic&t=tf&m=t&r=10"  class="flex flex-wrap no-underline hover:no-underline h-full w-full rounded-t pb-6"></iframe>
+            </div>
+                <div
+                    class="
+                    flex-none
+                    mt-auto
+                    bg-white
+                    rounded-b rounded-t-none
+                    overflow-hidden
+                    shadow-lg
+                    p-6
+                    "
+                >
+                    <div class="flex items-center justify-end">
+                        <p class="text-sm font-mono text-blue-600">/?lang=arithmetic&t=tf&m=t&r=10</p>
+                    </div>
+                </div>
+                </div>
+    
+                <!--1/2 col -->
+                <div
+                class="w-full md:w-1/2 p-6 flex flex-col flex-grow flex-shrink"
+                style="height:40rem;"
+                >
+                <div
+                    class="
+                    flex-1 flex-row
+                    bg-white
+                    rounded-t rounded-b-none
+                    overflow-hidden
+                    shadow-lg
+                    "
+                >
+                <p class="text-gray-700 px-6 pt-6">Start to train a new dataset</p>
+                <iframe src="https://api-orn.herokuapp.com/training"  class="flex flex-wrap no-underline hover:no-underline h-full w-full rounded-t pb-6"></iframe>
+                </div>
+                <div
+                    class="
+                    flex-none
+                    mt-auto
+                    bg-white
+                    rounded-b rounded-t-none
+                    overflow-hidden
+                    shadow-lg
+                    p-6
+                    "
+                >
+                <div class="flex items-center justify-end">
+                    <p class="text-sm font-mono text-blue-600">/training</p>
+                    </div>
+                </div>
+                </div>
+          
+          </div>
+          <!--/ Post Content-->
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
