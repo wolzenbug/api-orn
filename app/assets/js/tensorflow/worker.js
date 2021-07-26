@@ -27,7 +27,7 @@ async function predict(data, map, path) {
     }
 
     const x = tf.tensor(data)
-    const example = tf.reshape(x, [-1, 28, 28, 1]);
+    const example = tf.reshape(x, [-1, 28, 28]);
 
     const prediction = model.predict(example)
 
